@@ -1,5 +1,5 @@
 /*Declaraciones*/
-RESERVADA "auto"|"base"|"boolean"|"break"|"case"|"catch"|"class"|"char"|"continue"|"default"|"do"|"double"|"else"|"enum"|"extern"|"false"|"finally"|"float"|"for"|"goto"|"if"|"include"|"int"|"interface"|"long"|"namespace"|"new"|"override"|"private"|"protected"|"public"|"return"|"sealed"|"short"|"signed"|"sizeof"|"static"|"struct"|"switch"|"this"|"throw"|"true"|"typedef"|"union"|"unsigned"|"using"|"virtual"|"void"|"while"
+RESERVADA "auto"|"break"|"case"|"char"|"continue"|"default"|"do"|"define"|"double"|"else"|"enum"|"extern"|"float"|"for"|"goto"|"if"|"include"|"int"|"long"|"register"|"return"|"short"|"signed"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"void"|"while"
 DELIMITADORES [?:;,(){}]
 COMENTARIO "//".*\n
 MULTILINEA \/\*.*\n*.*\*\/
@@ -14,8 +14,18 @@ ESPACIO [[:blank:]]
 ENTERO  [[:digit:]]+|0[0-7]+|"0x"[0-9A-Fa-f]|"0X"[0-9A-Fa-f] 
 REAL [0-9]*.[0-9]+|"0X"[0-9A-Fa-f]*.[0-9A-Fa-f]|"0x"[0-9A-Fa-f]*.[0-9A-Fa-f]
 MANTISA {ENTERO}[eE][+-]?{ENTERO}|{REAL}[eE][+-]?{REAL}
-CARACTER \'[^\n\'\\\"]\'|\'\'|\'\\[0-377]\'|\'\\x[0-9A-Fa-f][0-9A-Fa-f]?\'
-CADENA \"[^\"]*\"
+CARACTER '[^\n'\]'|'(\'|\"|\?|\\|\n|\r|\t|\v)'|'\(3[0-6][0-7]|37[0-7]|[0-2][0-7]{2}|[0-7]{1,2})'|'\x[0-7a-fA-F]{1,2}'
+CADENA "([^\n"\]|\'|\"|\?|\\|\n|\r|\t|\v|\(3[0-6][0-7]|37[0-7]|[0-2][0-7]{2}|[0-7]{1,2})|\x[0-7a-fA-F]{1,2}|\\n)*"
+PATH "#include "\<.*\>
+
+{SALTO_LINEA} numeroLinea++;
+"/" BEGIN(Comentario);
+ "//" BEGIN(Comentario_Linea);
+<Comentario>\n numeroLinea++;
+<Comentario>. ;
+<Comentario>"/" BEGIN(INITIAL) ;
+<Comentario_Linea>{SALTO_LINEA}     { BEGIN(INITIAL); ++numeroLinea; }
+
 %{
 /*Declaraciones en C*/
 	#include <stdio.h>
