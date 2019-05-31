@@ -1,10 +1,11 @@
 /*Declaraciones*/
 RESERVADA "auto"|"break"|"case"|"char"|"continue"|"default"|"do"|"define"|"double"|"else"|"enum"|"extern"|"float"|"for"|"goto"|"if"|"include"|"int"|"long"|"register"|"return"|"short"|"signed"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"void"|"while"
 DELIMITADORES [?:;,(){}]
-COMENTARIO "//".*\n
-MULTILINEA \/\*.*\n*.*\*\/
+
 
 OPERADOR "*="|"%="|"+="|"-=" |"/="|"<<="|">>="|"&="|"|="|"^="|"--"|"++"|"<="|">="|"<<"|">>"|"=="|"!="|"&&"|"||"|"->"|"**"
+
+SALTO_LINEA            \n
 
 IDENTIFICADOR [A-Za-z_][A-Za-z_0-9]*
 ESPACIO [[:blank:]]
@@ -14,6 +15,8 @@ MANTISA {ENTERO}[eE][+-]?{ENTERO}|{REAL}[eE][+-]?{REAL}
 CARACTER '[^\n'\]'|'(\'|\"|\?|\\|\n|\r|\t|\v)'|'\(3[0-6][0-7]|37[0-7]|[0-2][0-7]{2}|[0-7]{1,2})'|'\x[0-7a-fA-F]{1,2}'
 CADENA "([^\n"\]|\'|\"|\?|\\|\n|\r|\t|\v|\(3[0-6][0-7]|37[0-7]|[0-2][0-7]{2}|[0-7]{1,2})|\x[0-7a-fA-F]{1,2}|\\n)*"
 PATH \<.*\>
+%x Comentario
+%x Comentario_Linea
 
 {SALTO_LINEA} numeroLinea++;
 "/" BEGIN(Comentario);
