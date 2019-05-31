@@ -3,28 +3,20 @@ RESERVADA "auto"|"break"|"case"|"char"|"continue"|"default"|"do"|"define"|"doubl
 DELIMITADORES [?:;,(){}]
 
 
-OPERADOR "*="|"%="|"+="|"-=" |"/="|"<<="|">>="|"&="|"|="|"^="|"--"|"++"|"<="|">="|"<<"|">>"|"=="|"!="|"&&"|"||"|"->"|"**"
-
-SALTO_LINEA            \n
+OPERADOR "*="|"%="|"+="|"-="|"/="|"<<="|">>="|"&="|"\|="|"^="|"--"|"++"|"<="|">="|"<<"|">>"|"=="|"!="|"&&"|"\|\|"|"->"|"**"
 
 IDENTIFICADOR [A-Za-z_][A-Za-z_0-9]*
 ESPACIO [[:blank:]]
 ENTERO  [[:digit:]]+|0[0-7]+|"0x"[0-9A-Fa-f]|"0X"[0-9A-Fa-f] 
 REAL [0-9]*.[0-9]+|"0X"[0-9A-Fa-f]*.[0-9A-Fa-f]|"0x"[0-9A-Fa-f]*.[0-9A-Fa-f]
 MANTISA {ENTERO}[eE][+-]?{ENTERO}|{REAL}[eE][+-]?{REAL}
-CARACTER '[^\n'\]'|'(\'|\"|\?|\\|\n|\r|\t|\v)'|'\(3[0-6][0-7]|37[0-7]|[0-2][0-7]{2}|[0-7]{1,2})'|'\x[0-7a-fA-F]{1,2}'
-CADENA "([^\n"\]|\'|\"|\?|\\|\n|\r|\t|\v|\(3[0-6][0-7]|37[0-7]|[0-2][0-7]{2}|[0-7]{1,2})|\x[0-7a-fA-F]{1,2}|\\n)*"
+SALTO_LINEA            \n
+CARACTER         '[^\n'\\]'|'(\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v)'|'\\(3[0-6][0-7]|37[0-7]|[0-2][0-7]{2}|[0-7]{1,2})'|'\\x[0-7a-fA-F]{1,2}'
+CADENA         \"([^\n"\\]|\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v|\\(3[0-6][0-7]|37[0-7]|[0-2][0-7]{2}|[0-7]{1,2})|\\x[0-7a-fA-F]{1,2}|\\\n)*\"
 PATH \<.*\>
 %x Comentario
 %x Comentario_Linea
 
-{SALTO_LINEA} numeroLinea++;
-"/" BEGIN(Comentario);
- "//" BEGIN(Comentario_Linea);
-<Comentario>\n numeroLinea++;
-<Comentario>. ;
-<Comentario>"/" BEGIN(INITIAL) ;
-<Comentario_Linea>{SALTO_LINEA}     { BEGIN(INITIAL); ++numeroLinea; }
 
 %{
 /*Declaraciones en C*/
@@ -33,7 +25,7 @@ PATH \<.*\>
 %}
 /*Reglas*/
 %%
-[[:blank:]]*{COMENTARIO}[[:blank:]]*|[[:blank:]]*{MULTILINEA}[[:blank:]]* linea++; 
+
 [[:blank:]]*{CADENA}[[:blank:]]* printf("\nlinea %d, Cadena: ",linea);ECHO;printf("\n");
 [[:blank:]]*{RESERVADA}[[:blank:]]* printf("\nlinea %d, Palabra Reservada: ",linea);ECHO;printf("\n"); /*RECONOCE PALABRAS RESERVADAS*/
 [[:blank:]]*{CARACTER}[[:blank:]]* printf("\nlinea %d, Caracter: ",linea);ECHO;printf("\n");
@@ -42,7 +34,19 @@ PATH \<.*\>
 [[:blank:]]*{ENTERO}[[:blank:]]* printf("\nlinea %d, Constante Entera: ",linea);ECHO;printf("\n");
 [[:blank:]]*{OPERADOR}[[:blank:]]* printf("\nlinea %d, Operador: ",linea);ECHO;printf("\n");
 [[:blank:]]*{MANTISA}[[:blank:]]*|[[:blank:]]*{REAL}[[:blank:]]* printf("\nlinea %d, Constante Real : ",linea);ECHO;printf("\n");
-\n linea++;
+{PATH} printf("\nlinea %d, PATH: ",linea);ECHO;printf("\n");
+{SALTO_LINEA} linea ++;
+
+"/*" BEGIN(Comentario);
+ "\/\/" BEGIN(Comentario_Linea);
+<Comentario>\n linea ++;
+<Comentario>. ;
+<Comentario>"*/" BEGIN(INITIAL) ;
+<Comentario_Linea>{SALTO_LINEA}     { BEGIN(INITIAL); ++linea ; }
+
+".*" printf("Línea %d,token no reconocido: %s%s", linea , yytext, "\n");
+
+
 %%
 /*Codigo C*/
 /*yywrap() Se ejecuta al llegar al final del fichero y devuelve 1 para indicar que no queda texto por procesar*/
@@ -52,7 +56,6 @@ int yywrap(){
 } 
 
 int main(char args[]) {
-   
     yyin = fopen(args,"r");/*Abre el fichero pasado como argumento en modo lectura*/
 
 /*  yylex() toma caracteres de la entrada hasta que coinciden con una exp. reg*/
