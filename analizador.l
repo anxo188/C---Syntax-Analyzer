@@ -3,11 +3,11 @@ RESERVADA "auto"|"break"|"case"|"char"|"continue"|"default"|"do"|"define"|"doubl
 IDENTIFICADOR [A-Za-z_][A-Za-z_0-9]*
 
 /*Constantes*/
-ENTERO  [[:digit:]]+| 0[0-7]+ | "0x"[0-9A-Fa-f]+
-REAL [0-9]*.[0-9]+| "0X"[0-9A-Fa-f]*.[0-9A-Fa-f]+ | "0x"[0-9A-Fa-f]*.[0-9A-Fa-f]+
+INT  [[:digit:]]+| 0[0-7]+ | "0x"[0-9A-Fa-f]+
+FLOAT [0-9]*.[0-9]+| "0X"[0-9A-Fa-f]*.[0-9A-Fa-f]+ | "0x"[0-9A-Fa-f]*.[0-9A-Fa-f]+
 MANTISA {ENTERO}[eE][+-]?{ENTERO}|{REAL}[eE][+-]?{REAL}
 
-CARACTER '[^\n'\\]'|'(\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v)'|'\\(37[0-7]|3[0-6][0-7]|[0-2][0-7]{2}|[0-7]{1,2})'|'\\x[0-9a-fA-F]{1,2}'
+CHAR '[^\n'\\]'|'(\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v)'|'\\(37[0-7]|3[0-6][0-7]|[0-2][0-7]{2}|[0-7]{1,2})'|'\\x[0-9a-fA-F]{1,2}'
 CADENA \"([^\n"\\]|\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v|\\(37[0-7]|3[0-6][0-7]|[0-2][0-7]{2}|[0-7]{1,2})|\\x[0-9a-fA-F]{1,2}|\\\n)*\"
 
 DIRECTORIO [^'\n'\"\/\>]+
@@ -16,7 +16,7 @@ PATH \<\/?({DIRECTORIO}/)*{ARCHIVO}\>
 
 DELIMITADORES [?:;,(){}]
 
-OPERADOR "+" | "-" | "*" | "**" | "/" | "%" | "--" | "++" | "*=" | "/=" | "%=" | "+=" | "-=" | "." | "->" | "&" | "[" | "]" | "~" | "|" | "^" | "<<" | ">>" | "<<=" | ">>=" | "&=" | "^=" | "|=" | "<" | ">" | "<=" | ">=" | "==" | "!=" | "!" | "&&" | "||" | "=" | "#"
+OPERADOR "+" | "-" | "*" | "/" | "%" | "/=" | "%=" | "+=" | "-=" | "." | "->" | "&" | "[" | "]" | "~" | "|" | "^" | "<<" | ">>" | "<<=" | ">>=" | "&=" | "^=" | "|=" | "<" | ">" | "<=" | ">=" | "==" | "!=" | "!" | "&&" | "||" | "=" | "#"
 
 CLINEA \/\/
 CMULTI \/\*
@@ -37,28 +37,15 @@ FIN_CMULTI \*\/
 %}
 /*Reglas*/
 %%
-
-
-
-
-
-
-
 {RESERVADA} printf("nlinea %d, Palabra reservada: %s",linea,yytext); return strupr(*yytext);
-{IDENTIFICADOR} printf("\nlinea %d, Identificador: ",linea);return IDENTIFICADOR;
-sizeof printf("\nlinea %d, Operador: %s",linea,yytext);return SIZEOF;
-
-{ENTERO} printf("\nlinea %d, Constante Entera: %s",linea,yytext); return ENTERO;
-{REAL} printf("\nlinea %d, Constante Real : %s",linea,yytext); return REAL;
+{IDENTIFICADOR} printf("\nlinea %d, Identificador: %s",linea,yytext);return IDENTIFICADOR;
+"sizeof" printf("\nlinea %d, Operador: %s",linea,yytext);return SIZEOF;
+{INT} printf("\nlinea %d, Constante Entera: %s",linea,yytext); return ENTERO;
+{FLOAT} printf("\nlinea %d, Constante Real : %s",linea,yytext); return REAL;
 {MANTISA} printf("\nlinea %d, Constante Real : %s",linea,yytext); return REAL;
-
-
-
-
 {DELIMITADORES} printf("\nlinea %d, Delimitador: %s",linea,yytext);return *yytext;
 "# include"[[:blank:]]*{PATH} printf("\nlinea %d, PATH: %s",linea,yytext);return PATH;
 
-/*Operadores*/
 \+=	printf("\nlinea %d, Operador: %s",linea,yytext); return SUMA_ASIG; 
 -=	printf("\nlinea %d, Operador: %s",linea,yytext); return RESTA_ASIG; 
 \*=	printf("\nlinea %d, Operador: %s",linea,yytext); return MULT_ASIG; 
@@ -82,8 +69,7 @@ sizeof printf("\nlinea %d, Operador: %s",linea,yytext);return SIZEOF;
 -\>	printf("\nlinea %d, Operador: %s",linea,yytext); return PTR_ACCESO;
 **	printf("\nlinea %d, Operador: %s",linea,yytext); return POTENCIA;
 {OPERADOR} printf("\nlinea %d, Operador: ",linea);return *yytext;
-
-{CARACTER} printf("\nlinea %d, Caracter: %s",linea,yytext); return CARACTER;
+{CHAR} printf("\nlinea %d, Caracter: %s",linea,yytext); return CARACTER;
 {CADENA}	{	size_t entrada = yyleng;
 			char* actual = yytext;
 			size_t restante = tamEntrada;
@@ -102,7 +88,7 @@ sizeof printf("\nlinea %d, Operador: %s",linea,yytext);return SIZEOF;
 			}
 			return STRING;
 		}
-
+		
 {CLINEA}	BEGIN(COMENTARIO_LINEA);
 {CMULTI}	BEGIN(COMENTARIO_MULTI);
 
@@ -119,8 +105,6 @@ sizeof printf("\nlinea %d, Operador: %s",linea,yytext);return SIZEOF;
 
 {SALTO_LINEA} linea ++;
 ".*" printf("\n Línea %d, token no reconocido: %s \n", linea , yytext);
-
-
 %%
 /*Codigo C*/
 /*yywrap() Se ejecuta al llegar al final del fichero y devuelve 1 para indicar que no queda texto por procesar*/
