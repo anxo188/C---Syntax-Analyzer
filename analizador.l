@@ -1,4 +1,3 @@
-
 %{
 
         #include <stdlib.h>
@@ -19,28 +18,16 @@ CADENA \"([^\n"\\]|\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v|\\(37[0-7]|3[0-6][0-7]|[0
 DIRECTORIO [^'\n'\"\/\>]+
 ARCHIVO [^'\n'\"\/\>]+\.[:ascii:]
 PATH \<\/?({DIRECTORIO}\/)*{ARCHIVO}\>
-
 DELIMITADORES [?:;,(){}]
-
-
-
 %x Comentario
 %x Comentario_Linea
-
-
-
 %%
-
 {RESERVADA} {printf("nlinea %d, Palabra reservada: %s",linea,yytext);  return strupr(*yytext);}
 "sizeof" {printf("\nlinea %d, Operador: %s",linea,yytext);  return(SIZEOF);}
 {IDENTIFICADOR} {printf("\nlinea %d, Identificador: ",linea);  return(IDENTIFICADOR);}
 {INT} {printf("\nlinea %d, Constante Entera: %s",linea,*yytext);  return(ENTERO);}
 {FLOAT} {printf("\nlinea %d, Constante Real : %s",linea,*yytext);  return(REAL);}
 {MANTISA} {printf("\nlinea %d, Constante Real : %s",linea,*yytext);  return(REAL);}
-
-
-
-
 {DELIMITADORES} {printf("\nlinea %d, Delimitador: %s",linea,yytext); return *yytext};
 {PATH} {printf("\nlinea %d, PATH: %s",linea,yytext); return(PATH)};
 
@@ -69,7 +56,6 @@ DELIMITADORES [?:;,(){}]
 {OPERADOR} {printf("\nlinea %d, Operador: ",linea); return(*yytext);}
 {CARACTER} {printf("\nlinea %d, Caracter: %s",linea,yytext);  return(CARACTER);}
 {CADENA} {printf("\nlinea %d, Caracter: %s",linea,yytext);  return(CADENA);}
-
 {SALTO_LINEA} numeroLinea++;
 "/*" BEGIN(Comentario);
  "\/\/" BEGIN(Comentario_Linea);
@@ -77,21 +63,15 @@ DELIMITADORES [?:;,(){}]
 <Comentario>. ;
 <Comentario>"*/" {BEGIN(INITIAL) ;}
 <Comentario_Linea>{SALTO_LINEA}     { BEGIN(INITIAL); ++numeroLinea; }
-
 ".*" printf("\n Línea %d, token no reconocido: %s \n", linea , yytext);
-
-
 %%
 /*Codigo C*/
 /*yywrap() Se ejecuta al llegar al final del fichero y devuelve 1 para indicar que no queda texto por procesar*/
-
 int yywrap(){	
 	 return 1; 
 } 
-
 int main(char args[]) {
     yyin = fopen(args,"r");/*Abre el fichero pasado como argumento en modo lectura*/
-
 /*  yylex() toma caracteres de la entrada hasta que coinciden con una exp. reg*/
     while (yylex()){
     	printf("Tratando linea %d",linea);
