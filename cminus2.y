@@ -116,12 +116,8 @@ definicion_struct_union : struct_union '{' lista_declaraciones_struct '}'
 
 
 
-lista_comas_nombre: nombre
-  | lista_comas_nombre ',' nombre
-;
-
 //declaracion_struct ::= tipo_basico_modificado ( nombre )+ ';'| definicion_struct_union ( nombre )+ ';'
-declaracion_struct : tipo_basico_modificiado lista_comas_nombre ';'
+declaracion_struct : tipo_basico_modificiado lista_nombre ';'
   | definicion_struct_union lista_comas_nombre ';'
 ;
 
