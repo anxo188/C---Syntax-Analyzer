@@ -109,13 +109,11 @@ lista_declaraciones_struct: declaracion_struct
   | lista_declaraciones_struct declaracion_struct
 ;
 
-lista_identificadores: IDENTIFICADOR
-  | lista_identificadores IDENTIFICADOR
-;
+
 
 //definicion_struct_union ::= struct_union [ IDENTIFICADOR ]? '{'[ declaracion_struct ]+ '}'| struct_union IDENTIFICADOR
 definicion_struct_union : struct_union '{' lista_declaraciones_struct '}'
-  | struct_union lista_identificadores '{' lista_declaraciones_struct '}'
+  | struct_union IDENTIFICADOR '{' lista_declaraciones_struct '}'
   | struct_union IDENTIFICADOR
 ;
 
@@ -174,6 +172,8 @@ cuerpo_enum: '{' lista_declaraciones_miembro_enum '}'
 declaracion_miembro_enum: IDENTIFICADOR
   | IDENTIFICADOR '=' expresion
 ;
+
+
 
 
 /*****************/
@@ -318,8 +318,53 @@ instruccion_retorno :  RETURN ';'
 /***************/
 /* EXPRESIONES */
 /***************/
+expresion_constante : 
+ENTERO 
+|REAL 
+|CADENA 
+|CARACTER
+;
+
+expresion_parentesis :
+'(' expresion ')'
+;
+
+lista_expresion:expresion
+lista_expresion expresion
+;
 
 
+//expresion_funcional : IDENTIFICADOR '(' ( expresion )* ')'
+expresion_funcional : IDENTIFICADOR :'(' ')'
+|'(' lista_expresion ')' 
+
+;
+
+
+expresion_indexada : IDENTIFICADOR
+| expresion_indexada ’[’ expresion ’]’
+| expresion_indexada ’.’ IDENTIFICADOR
+| expresion_indexada PTR_ACCESO IDENTIFICADOR
+;
+expresion_postfija : expresion_constante
+| expresion_parentesis
+| expresion_funcional
+| expresion_indexada
+| expresion_postfija INC
+| expresion_postfija DEC
+;
+expresion_prefija : expresion_postfija
+| SIZEOF expresion_prefija
+| SIZEOF ’(’ nombre_tipo ’)’
+| operador_unario expresion_cast
+;
+
+operador_unario : INC | DEC | ’&’ | ’*’ | ’+’ | ’-’ | ’~’ | ’!’
+;
+
+expresion_cast : expresion_prefija
+| ’(’ nombre_tipo ’)’ expresion_prefija
+;
 
 %%
 
