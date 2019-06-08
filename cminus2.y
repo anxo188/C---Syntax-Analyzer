@@ -89,7 +89,6 @@ declaracion_tipo : tipo_basico_modificado
 almacenamiento : EXTERN | STATIC | AUTO | REGISTER
 ;
 
-
 longitud : SHORT
 | LONG
 ;
@@ -108,8 +107,6 @@ tipo_basico : VOID
 lista_declaraciones_struct: declaracion_struct
   | lista_declaraciones_struct declaracion_struct
 ;
-
-
 
 //definicion_struct_union ::= struct_union [ IDENTIFICADOR ]? '{'[ declaracion_struct ]+ '}'| struct_union IDENTIFICADOR
 definicion_struct_union : struct_union '{' lista_declaraciones_struct '}'
@@ -158,7 +155,6 @@ definicion_enum: ENUM IDENTIFICADOR cuerpo_enum
   | ENUM IDENTIFICADOR ';' tipo_basico_modificado cuerpo_enum
 ;
 
-
 lista_declaraciones_miembro_enum: declaracion_miembro_enum
   | lista_declaraciones_miembro_enum declaracion_miembro_enum
 ;
@@ -167,14 +163,10 @@ lista_declaraciones_miembro_enum: declaracion_miembro_enum
 cuerpo_enum: '{' lista_declaraciones_miembro_enum '}'
 ;
 
-
 //declaracion_miembro_enum ::= IDENTIFICADOR [ ’=’ expresion ]?
 declaracion_miembro_enum: IDENTIFICADOR
   | IDENTIFICADOR '=' expresion
 ;
-
-
-
 
 /*****************/
 /* INSTRUCCIONES */
@@ -199,8 +191,6 @@ instruccion : bloque_instrucciones
   | ';'
 ;
 
-
-
 lista_declaraciones: declaracion
   | lista_declaraciones declaracion;
 
@@ -214,7 +204,6 @@ bloque_instrucciones : '{' '}'
   | '{' lista_declaraciones lista_instrucciones '}'
 ;
 
-
 //instruccion_expresion ::= expresion_funcional ';'| asignacion ';'
 instruccion_expresion : expresion_funcional ';'| asignacion ';'
 ;
@@ -222,7 +211,6 @@ instruccion_expresion : expresion_funcional ';'| asignacion ';'
 //asignacion ::= expresion_indexada operador_asignacion expresion
 asignacion : expresion_indexada operador_asignacion expresion
 ;
-
 
 //operador_asignacion ::= '='| '*='| '/='| '%='| '+='| '-='| '<<='| '>>='| '&='| '^='| '|='
 operador_asignacion : '=' 
@@ -237,8 +225,6 @@ operador_asignacion : '='
   | XOR_ASIG 
   | OR_ASIG
 ;
-
-
 
 lista_else: ELSE instruccion
   | ELSE instruccion lista_else
@@ -265,11 +251,9 @@ instruccion_caso : CASE expresion ':' instruccion
   | DEFAULT ':' instruccion
 ;  
 
-
 lista_definicion_asignacion: definicion_asignacion
   | lista_definicion_asignacion','definicion_asignacion
 ;
-
 
 /*
 instruccion_bucle ::= 'while''('expresion ')'instruccion
@@ -314,7 +298,6 @@ instruccion_retorno :  RETURN ';'
   | RETURN expresion ';'
 ;
 
-
 /***************/
 /* EXPRESIONES */
 /***************/
@@ -333,19 +316,17 @@ lista_expresion:expresion
 lista_expresion expresion
 ;
 
-
 //expresion_funcional : IDENTIFICADOR '(' ( expresion )* ')'
 expresion_funcional : IDENTIFICADOR :'(' ')'
-|'(' lista_expresion ')' 
-
+  |'(' lista_expresion ')' 
 ;
-
 
 expresion_indexada : IDENTIFICADOR
 | expresion_indexada ’[’ expresion ’]’
 | expresion_indexada ’.’ IDENTIFICADOR
 | expresion_indexada PTR_ACCESO IDENTIFICADOR
 ;
+
 expresion_postfija : expresion_constante
 | expresion_parentesis
 | expresion_funcional
@@ -353,6 +334,7 @@ expresion_postfija : expresion_constante
 | expresion_postfija INC
 | expresion_postfija DEC
 ;
+
 expresion_prefija : expresion_postfija
 | SIZEOF expresion_prefija
 | SIZEOF ’(’ nombre_tipo ’)’
@@ -420,13 +402,6 @@ expresion_potencia: expresion_cast
 expresion: expresion_or_logico
   | expresion_or_logico '?' expresion ':' expresion
 ;
-
- 
-
-
-
-
-
 
 %%
 
