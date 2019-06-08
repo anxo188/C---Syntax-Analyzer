@@ -79,7 +79,143 @@ declaracion : declaracion_tipo lista_nombre ';' { printf (" declaracion -> decla
 /*****************/
 /* INSTRUCCIONES */
 /*****************/
+/*
+instruccion ::= bloque_instrucciones
+  | instruccion_expresion
+  | instruccion_bifurcacion
+  | instruccion_bucle
+  | instruccion_salto
+  | instruccion_destino_salto
+  | instruccion_retorno
+  | ’;’
+*/
+instruccion : bloque_instrucciones
+  | instruccion_expresion
+  | instruccion_bifurcacion
+  | instruccion_bucle
+  | instruccion_salto
+  | instruccion_destino_salto
+  | instruccion_retorno
+  | ';'
+;
 
+
+
+lista_declaraciones: declaracion
+  | lista_declaraciones declaracion;
+
+lista_instrucciones: instruccion
+  | lista_instrucciones instruccion;
+
+//bloque_instrucciones ::= ’{’ [ declaracion ]* [ instruccion ]* ’}’
+bloque_instrucciones : '{' '}' 
+  | '{' lista_declaraciones '}'
+  | '{' lista_instrucciones '}'
+  | '{' lista_declaraciones lista_instrucciones '}'
+;
+
+
+//instruccion_expresion ::= expresion_funcional ’;’ | asignacion ’;’
+instruccion_expresion : expresion_funcional ’;’ | asignacion ’;’
+;
+
+//asignacion ::= expresion_indexada operador_asignacion expresion
+asignacion : expresion_indexada operador_asignacion expresion
+;
+
+
+//operador_asignacion ::= ’=’ | ’*=’ | ’/=’ | ’%=’ | ’+=’ | ’-=’ | ’<<=’ | ’>>=’ | ’&=’ | ’^=’ | ’|=’
+operador_asignacion : '=' 
+  | MULTI_ASIG 
+  | DIV_ASIG 
+  | MOD_ASIG 
+  | SUM_ASIG 
+  | RESTA_ASIG 
+  | DESPI_ASIG
+  | DESPD_ASIG 
+  | AND_ASIG 
+  | XOR_ASIG 
+  | OR_ASIG
+;
+
+
+
+lista_else: ELSE instruccion
+  | ELSE instruccion lista_else
+;
+
+lista_instruccion_caso: instruccion_caso
+  | lista_instruccion_caso instruccion_caso
+;
+ 
+/*
+instruccion_bifurcacion ::= ’if’ ’(’ expresion ’)’ instruccion [ ’else’ instruccion ]?
+  | SWITCH ’(’ expresion ’)’ ’{’ [ instruccion_caso ]+ ’}’
+*/
+instruccion_bifurcacion : IF '(' expresion ')'
+  | IF '(' expresion ')' instruccion lista_else 
+  | SWITCH ’(’ expresion ’)’ ’{’ lista_instruccion_caso ’}’
+;
+
+/*
+instruccion_caso ::= ’case’ expresion ’:’ instruccion
+  | ’default’ ’:’ instruccion
+*/
+instruccion_caso : CASE expresion ':' instruccion
+  | DEFAULT ':' instruccion
+;  
+
+
+
+
+
+lista_definicion_asignacion: definicion_asignacion
+  | lista_definicion_asignacion','definicion_asignacion
+;
+
+
+/*
+instruccion_bucle ::= ’while’ ’(’ expresion ’)’ instruccion
+  | ’do’ instruccion ’while’ ’( expresion ’)’ ’;’
+  | ’for’ ’(’ ( definicion_asignacion )* ’;’ expresion ’;’ expresion ’)’instruccion
+  | ’for’ ’(’ [ declaracion_tipo [ ’*’ ]* ]? IDENTIFICADOR ’;’ expresion ’)’instruccioN
+*/
+
+instruccion_bucle : WHILE ’(’ expresion ')' instruccion
+  | DO instruccion WHILE ’( expresion ’)’ ’;’
+  | FOR ’(’ lista_definicion_asignacion ’;’ expresion ’;’ expresion ’)’ instruccion
+  | FOR ’(’ ’;’ expresion ’;’ expresion ’)’ instruccion
+  | FOR ’(’ IDENTIFICADOR ’;’ expresion ’)’ instruccion
+  | FOR ’(’ declaracion_tipo lista_asteriscos IDENTIFICADOR ’;’ expresion ’)’instruccion //lista_asteriscos declarada arriba
+;
+
+/*
+definicion_asignacion ::= asignacion
+  | declaracion_tipo [ ’*’ ]* expresion_indexada ’=’ expresion
+*/
+definicion_asignacion : asignacion
+  | declaracion_tipo expresion_indexada ’=’ expresion
+  | declaracion_tipo lista_asteriscos expresion_indexada ’=’ expresion
+;
+
+/*
+instruccion_salto ::= ’goto’ IDENTIFICADOR ’;’ | ’continue’ ’;’ | ’break’ ’;’
+*/
+instruccion_salto : GOTO IDENTIFICADOR ’;’ | CONTINUE ’;’ | BREAK ’;’
+;
+
+/*
+instruccion_destino_salto ::= IDENTIFICADOR ’:’ instruccion ’;’
+*/
+instruccion_destino_salto : IDENTIFICADOR ’:’ instruccion ’;’
+;
+
+/*
+instruccion_retorno ::= ’return’ [ expresion ]? ’;’
+*/
+instruccion_retorno :  RETURN ’;’
+  | RETURN expresion ’;’
+;
 
 /***************/
 /* EXPRESIONES */
