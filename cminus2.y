@@ -39,7 +39,7 @@ bloque : definicion_funcion
 lista_asteriscos: * { printf ("lista_asteriscos  -> *\n"); }
 |lista_asteriscos * { printf ("lista_asteriscos  -> lista_asteriscos *\n"); }
 ;
-//definicion_funcion : [ declaracion_tipo [ ’*’ ]* ]? IDENTIFICADOR bloque_instrucciones 8posible conflicto aqui , puede que haya que cambiar lista asteriscos)
+//definicion_funcion : [ declaracion_tipo [ ’*’ ]* ]? IDENTIFICADOR bloque_instrucciones (posible conflicto aqui , puede que haya que cambiar lista asteriscos)
 definicion_funcion  : IDENTIFICADOR bloque_instrucciones { printf ("  definicion_funcion  -> IDENTIFICADOR bloque_instrucciones\n"); }
 | declaracion_tipo  IDENTIFICADOR bloque_instrucciones { printf (" definicion_funcion  -> declaracion_tipo IDENTIFICADOR bloque_instrucciones\n"); }
 |declaracion_tipo lista_asteriscos IDENTIFICADOR bloque_instrucciones { printf (" declaracion_tipo definicion_funcion  -> declaracion_tipo lista_asteriscos IDENTIFICADOR bloque_instrucciones\n"); }
@@ -66,14 +66,45 @@ lista_nombre ',' nombre { printf (" lista_nombre -> declaracion_tipo lista_nombr
 
 //declaracion : declaracion_tipo ( nombre )* [ ’#’ ]? ’;’ | ’typedef’ declaracion_tipo IDENTIFICADOR ’;’(posible problema con la lista nombre , preguntar a alex)
 declaracion : declaracion_tipo lista_nombre ';' { printf (" declaracion -> declaracion_tipo lista_nombre ;\n"); }
-|declaracion_tipo  # ';' { printf (" declaracion -> declaracion_tipo lista_nombre # ;\n"); }
+|declaracion_tipo    ';' { printf (" declaracion -> declaracion_tipo   ;\n"); }
 |declaracion_tipo  # ';' { printf (" declaracion -> declaracion_tipo lista_nombre # ;\n"); }
 |declaracion_tipo lista_nombre # ';' { printf (" declaracion -> declaracion_tipo lista_nombre # ;\n"); }
 |'typedef' declaracion_tipo IDENTIFICADOR ';'  { printf (" declaracion -> 'typedef' declaracion_tipo IDENTIFICADOR ';'\n"); }
 ;
 
+lista_almacenamiento:almacenamiento { printf (" lista_almacenamiento -> almacenamiento ';'\n"); }
+|lista_almacenamiento almacenamiento { printf (" lista_almacenamiento -> lista_almacenamiento almacenamiento ';'\n"); }
+;
 
 //declaracion_tipo ::= [ almacenamiento ]* tipo_basico_modificado| [ almacenamiento ]* definicion_struct_union | [ almacenamiento ]* definicion_enum
+
+declaracion_tipo : [ almacenamiento ]* tipo_basico_modificado| [ almacenamiento ]* definicion_struct_union | [ almacenamiento ]* definicion_enum 
+;
+
+//almacenamiento ::= ’extern’ | ’static’ | ’auto’ | ’register’
+
+almacenamiento : ’extern’ | ’static’ | ’auto’ | ’register’
+;
+
+longitud : ’short’ 
+| ’long’
+;
+
+signo : ’signed’ 
+| ’unsigned’
+;
+
+tipo_basico :’void’ 
+|’char’ 
+|’int’ 
+|’float’
+|’double’
+;
+
+//definicion_struct_union ::= struct_union [ IDENTIFICADOR ]? ’{’ [ declaracion_struct ]+ ’}’| struct_union IDENTIFICADOR
+
+//declaracion_struct ::= tipo_basico_modificado ( nombre )+ ’;’ | definicion_struct_union ( nombre )+ ’;’
+
 
 
 /*****************/
@@ -216,6 +247,7 @@ instruccion_retorno ::= ’return’ [ expresion ]? ’;’
 instruccion_retorno :  RETURN ’;’
   | RETURN expresion ’;’
 ;
+
 
 /***************/
 /* EXPRESIONES */
