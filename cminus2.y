@@ -77,8 +77,13 @@ lista_almacenamiento: almacenamiento { printf (" lista_almacenamiento -> almacen
 ;
 
 //declaracion_tipo ::= [ almacenamiento ]* tipo_basico_modificado| [ almacenamiento ]* definicion_struct_union | [ almacenamiento ]* definicion_enum
-
-
+declaracion_tipo : tipo_basico_modificado
+  | lista_almacenamiento tipo_basico_modificado
+  | definicion_struct_union
+  | lista_almacenamiento  definicion_struct_union
+  | definicion_enum
+  | lista_almacenamiento definicion_enum
+;
 
 //almacenamiento ::= 'extern'| 'static'| 'auto'| 'register'
 almacenamiento : EXTERN | STATIC | AUTO | REGISTER
@@ -114,11 +119,60 @@ definicion_struct_union : struct_union '{' lista_declaraciones_struct '}'
   | struct_union IDENTIFICADOR
 ;
 
-
+//struct_union ::= ’struct’ | ’union’
+struct_union: STRUCT
+  | UNION
+;
 
 //declaracion_struct ::= tipo_basico_modificado ( nombre )+ ';'| definicion_struct_union ( nombre )+ ';'
 declaracion_struct : tipo_basico_modificiado lista_nombre ';'
   | definicion_struct_union lista_comas_nombre ';'
+;
+
+//nombre ::= dato [ ’=’ elementos ]?
+nombre: dato
+  | dato '=' elementos
+;
+
+lista_expresiones: '[' ']'
+  | '[' expresion ']'
+  | lista_expresiones '[' ']'
+  | lista_expresiones '[' expresion ']'
+;
+
+//dato ::= [ ’*’ ]* IDENTIFICADOR [ ’[’ [ expresion ]? ’]’ ]*
+dato: IDENTIFICADOR
+  | lista_asteriscos IDENTIFICADOR
+  | lista_asteriscos IDENTIFICADOR lista_expresiones
+;
+
+lista_elementos: elemento
+  |lista_elementos elemento
+;
+
+//elementos ::= expresion | ’{’ ( elementos )+ ’}’
+elementos: expresion
+  | '{' lista_elementos '}'
+;
+
+//definicion_enum ::= ’enum’ IDENTIFICADOR  [’:’ tipo_basico_modificado ]? cuerpo_enum
+definicion_enum: ENUM IDENTIFICADOR cuerpo_enum
+  | ENUM IDENTIFICADOR ';' tipo_basico_modificado cuerpo_enum
+;
+
+
+lista_declaraciones_miembro_enum: declaracion_miembro_enum
+  | lista_declaraciones_miembro_enum declaracion_miembro_enum
+;
+
+//cuerpo_enum ::= ’{’ ( declaracion_miembro_enum )+ ’}’
+cuerpo_enum: '{' lista_declaraciones_miembro_enum '}'
+;
+
+
+//declaracion_miembro_enum ::= IDENTIFICADOR [ ’=’ expresion ]?
+declaracion_miembro_enum: IDENTIFICADOR
+  | IDENTIFICADOR '=' expresion
 ;
 
 
@@ -210,9 +264,6 @@ instruccion_caso ::= 'case'expresion ':'instruccion
 instruccion_caso : CASE expresion ':' instruccion
   | DEFAULT ':' instruccion
 ;  
-
-
-
 
 
 lista_definicion_asignacion: definicion_asignacion
