@@ -1,50 +1,77 @@
-/*Declaraciones*/
-RESERVADA "auto"|"base"|"boolean"|"break"|"case"|"catch"|"class"|"char"|"continue"|"default"|"do"|"double"|"else"|"enum"|"extern"|"false"|"finally"|"float"|"for"|"goto"|"if"|"include"|"int"|"interface"|"long"|"namespace"|"new"|"override"|"private"|"protected"|"public"|"return"|"sealed"|"short"|"signed"|"sizeof"|"static"|"struct"|"switch"|"this"|"throw"|"true"|"typedef"|"union"|"unsigned"|"using"|"virtual"|"void"|"while"
-DELIMITADORES [?:;,(){}]
-COMENTARIO "//".*\n
-MULTILINEA \/\*.*\n*.*\*\/
-OPERADOR_A "\+"|"-"|"\*"|"/"|"&"|"--"|"++"|"*="|"%="|"+="|"-="
-OPERADOR_M  "."|"->"|"&"|"\["|"\]"
-OPERADOR_B "~"|"&"|"|"|"\^"|"<<"|">>"|"<<="|">>="|"&="|"^="|"|="
-OPERADOR_R "<"|">"|"<="|">="|"=="|"!="
-OPERADOR_L "!"|"&&"|"||"
-OPERADOR_O "="|"sizeof"
-IDENTIFICADOR [A-Za-z_][A-Za-z_0-9]*
-ESPACIO [[:blank:]]
-ENTERO  [[:digit:]]+|0[0-7]+|"0x"[0-9A-Fa-f]|"0X"[0-9A-Fa-f] 
-REAL [0-9]*.[0-9]+|"0X"[0-9A-Fa-f]*.[0-9A-Fa-f]|"0x"[0-9A-Fa-f]*.[0-9A-Fa-f]
-MANTISA {ENTERO}[eE][+-]?{ENTERO}|{REAL}[eE][+-]?{REAL}
-CARACTER \'[^\n\'\\\"]\'|\'\'|\'\\[0-377]\'|\'\\x[0-9A-Fa-f][0-9A-Fa-f]?\'
-CADENA \"[^\"]*\"
 %{
-/*Declaraciones en C*/
+
+        #include <stdlib.h>
 	#include <stdio.h>
-	int linea = 1;
+	#include "cminus2.tab.h"
+	unsigned int linea = 1;
 %}
-/*Reglas*/
+RESERVADA auto|break|case|char|continue|default|do|define|double|else|enum|extern|float|for|goto|if|include|int|long|register|return|short|signed|static|struct|switch|typedef|union|unsigned|void|while
+IDENTIFICADOR [A-Za-z_][A-Za-z_0-9]*
+
+INT [[:digit:]]+|0[0-7]+|0[xX][0-9A-F]+
+FLOAT [0-9]+[.][0-9]+|0[xX][0-9A-Fa-f]*[.][0-9A-Fa-f]+|0[xX][0-9A-Fa-f]*[.][0-9A-Fa-f]+
+MANTISA {INT}[eE][+-]?{INT}|{FLOAT}[eE][+-]?{FLOAT}
+OPERADOR "+"|"-"|"*"|"**"|"/"|"%"|"--"|"++"|"*="|"/="|"+="|"-="|"."|"->"|"&"|"["|"]"|"~"|"|"|"^"|"<<"|">>"|"<<="|">>="|"&="|"^="|"|="|"<"|">"|"<="|">="|"=="|"!="|"!"|"&&"|"||"|"="|"#"
+SALTO_LINEA      \n
+CARACTER '[^\n'\\]'|'(\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v)'|'\\(37[0-7]|3[0-6][0-7]|[0-2][0-7]{2}|[0-7]{1,2})'|'\\x[0-9a-fA-F]{1,2}'
+CADENA \"([^\n"\\]|\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v|\\(37[0-7]|3[0-6][0-7]|[0-2][0-7]{2}|[0-7]{1,2})|\\x[0-9a-fA-F]{1,2}|\\\n)*\"
+DIRECTORIO [^'\n'\"\/\>]+
+ARCHIVO [^'\n'\"\/\>]+\.[:ascii:]
+PATH \<\/?({DIRECTORIO}\/)*{ARCHIVO}\>
+DELIMITADORES [?:;,(){}]
+%x Comentario
+%x Comentario_Linea
 %%
-[[:blank:]]*{COMENTARIO}[[:blank:]]*|[[:blank:]]*{MULTILINEA}[[:blank:]]* linea++; 
-[[:blank:]]*{CADENA}[[:blank:]]* printf("\nlinea %d, Cadena: ",linea);ECHO;printf("\n");
-[[:blank:]]*{RESERVADA}[[:blank:]]* printf("\nlinea %d, Palabra Reservada: ",linea);ECHO;printf("\n"); /*RECONOCE PALABRAS RESERVADAS*/
-[[:blank:]]*{CARACTER}[[:blank:]]* printf("\nlinea %d, Caracter: ",linea);ECHO;printf("\n");
-[[:blank:]]*{IDENTIFICADOR}[[:blank:]]* printf("\nlinea %d, Identificador: ",linea);ECHO;printf("\n");
-[[:blank:]]*{DELIMITADORES}[[:blank:]]* printf("\nlinea %d, Delimitador: ",linea);ECHO;printf("\n");
-[[:blank:]]*{ENTERO}[[:blank:]]* printf("\nlinea %d, Constante Entera: ",linea);ECHO;printf("\n");
-[[:blank:]]*{OPERADOR_A}[[:blank:]]*|[[:blank:]]*{OPERADOR_B}[[:blank:]]*|[[:blank:]]*{OPERADOR_M}[[:blank:]]*|[[:blank:]]*{OPERADOR_R}[[:blank:]]*|[[:blank:]]*{OPERADOR_L}[[:blank:]]*|[[:blank:]]*{OPERADOR_O}[[:blank:]]* printf("\nlinea %d, Operador: ",linea);ECHO;printf("\n");
-[[:blank:]]*{MANTISA}[[:blank:]]*|[[:blank:]]*{REAL}[[:blank:]]* printf("\nlinea %d, Constante Real : ",linea);ECHO;printf("\n");
-\n linea++;
+{RESERVADA} {printf("nlinea %d, Palabra reservada: %s",linea,yytext);  return strupr(*yytext);}
+"sizeof" {printf("\nlinea %d, Operador: %s",linea,yytext);  return(SIZEOF);}
+{IDENTIFICADOR} {printf("\nlinea %d, Identificador: ",linea);  return(IDENTIFICADOR);}
+{INT} {printf("\nlinea %d, Constante Entera: %s",linea,*yytext);  return(ENTERO);}
+{FLOAT} {printf("\nlinea %d, Constante Real : %s",linea,*yytext);  return(REAL);}
+{MANTISA} {printf("\nlinea %d, Constante Real : %s",linea,*yytext);  return(REAL);}
+{DELIMITADORES} {printf("\nlinea %d, Delimitador: %s",linea,yytext); return *yytext};
+{PATH} {printf("\nlinea %d, PATH: %s",linea,yytext); return(PATH)};
+
+"\+="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(SUMA_ASIG); }
+"-="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(RESTA_ASIG); }
+"\*="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(MULT_ASIG); }
+"\/="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(DIV_ASIG); }
+"%="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(MOD_ASIG);}
+"\<\<="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(DESPI_ASIG); }
+"\>\>="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(DESPD_ASIG); }
+"&="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(AND_ASIG); }
+"\|="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(OR_ASIG); }
+"^="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(XOR_ASIG); }
+"\+\+"	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(INC);}
+"--"	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(DEC); }
+"\<\<"	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(DESPI);} 
+"\>\>"	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(DESPD); }
+"\>="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(GE); }
+"\<="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(LE); }
+"=="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(EQ); }
+"!="	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(NEQ); }
+"&&"	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(AND); }
+"\|\|"	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(OR); }
+"-\>"	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(PTR_ACCESO);}
+"**"	{printf("\nlinea %d, Operador: %s",linea,yytext);  return(POTENCIA);}
+{OPERADOR} {printf("\nlinea %d, Operador: ",linea); return(*yytext);}
+{CARACTER} {printf("\nlinea %d, Caracter: %s",linea,yytext);  return(CARACTER);}
+{CADENA} {printf("\nlinea %d, Caracter: %s",linea,yytext);  return(CADENA);}
+{SALTO_LINEA} numeroLinea++;
+"/*" BEGIN(Comentario);
+ "\/\/" BEGIN(Comentario_Linea);
+<Comentario>\n {numeroLinea++;}
+<Comentario>. ;
+<Comentario>"*/" {BEGIN(INITIAL) ;}
+<Comentario_Linea>{SALTO_LINEA}     { BEGIN(INITIAL); ++numeroLinea; }
+".*" printf("\n Línea %d, token no reconocido: %s \n", linea , yytext);
 %%
 /*Codigo C*/
 /*yywrap() Se ejecuta al llegar al final del fichero y devuelve 1 para indicar que no queda texto por procesar*/
-
 int yywrap(){	
-	return 1; 
+	 return 1; 
 } 
-
 int main(char args[]) {
-   
     yyin = fopen(args,"r");/*Abre el fichero pasado como argumento en modo lectura*/
-
 /*  yylex() toma caracteres de la entrada hasta que coinciden con una exp. reg*/
     while (yylex()){
     	printf("Tratando linea %d",linea);
