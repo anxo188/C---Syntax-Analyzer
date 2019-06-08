@@ -366,6 +366,68 @@ expresion_cast : expresion_prefija
 | ’(’ nombre_tipo ’)’ expresion_prefija
 ;
 
+expresion_or_logico: expresion_or_logico OR expresion_and_logico
+  | expresion_and_logico
+;
+
+expresion_and_logico: expresion_and_logico AND expresion_igual_distinto
+  | expresion_igual_distinto
+;
+
+expresion_igual_distinto: expresion_igual_distinto EQ expresion_mayor_menor
+  | expresion NEQ expresion_mayor_menor
+  | expresion_mayor_menor
+;
+
+expresion_mayor_menor: expresion_mayor_menor '<' expresion_or
+  | expresion_mayor_menor '>' expresion_or
+  | expresion_mayor_menor LE expresion_or
+  | expresion_mayor_menor GE expresion_or
+  |expresion_or
+;
+
+expresion_or: expresion_or '|' expresion_xor
+  | expresion_xor
+;
+
+expresion_xor: expresion_xor '^' expresion_and
+   | expresion_and
+;
+
+expresion_and: expresion_and '&' expresion_desplazar
+   | expresion desplazar
+;
+expresion_desplazar: expresion_desplazar DESPD expresion_suma_resta
+  | expresion_suma_resta
+;
+
+expresion_suma_resta: expresion_suma_resta '+' expresion_multiplicacion
+  | expresion_suma_resta '-' expresion_multiplicacion
+  | expresion_multiplicacion
+;
+
+expresion_multiplicacion: expresion_multiplicacion '*' expresion_potencia
+  | expresion_multiplicacion '/' expresion_potencia
+  | expresion_multiplicacion '%' expresion_potencia
+  | expresion_potencia
+;
+
+expresion_potencia: expresion_cast 
+  | expresion_cast '**' expresion_potencia
+ ;
+
+//expresion ::= expresion_or_logico [ ’?’ expresion ’:’ expresion ]?
+expresion: expresion_or_logico
+  | expresion_or_logico '?' expresion ':' expresion
+;
+
+ 
+
+
+
+
+
+
 %%
 
 
