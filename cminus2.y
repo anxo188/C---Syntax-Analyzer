@@ -50,10 +50,10 @@ definicion_funcion  : IDENTIFICADOR bloque_instrucciones { printf ("  definicion
 macros : '#' INCLUDE PATH { printf (" macros -> '#' 'include' PATH\n"); }
 | '#' DEFINE IDENTIFICADOR constante { printf (" macros -> '#' 'define' IDENTIFICADOR constante\n"); }
 ;
-//constante ::= ENTERO | REAL | CADENA | CARACTER
+//constante ::= ENTERO | REAL | STRING | CARACTER
 constante : ENTERO { printf (" constante -> ENTERO\n"); }
 | REAL  { printf (" constante -> REAL\n"); }
-| CADENA  { printf (" constante -> CADENA\n"); }
+| STRING  { printf (" constante -> STRING\n"); }
 | CARACTER  { printf (" constante -> CARACTER\n"); }
 ;
 
@@ -84,6 +84,13 @@ declaracion_tipo : tipo_basico_modificado
   | definicion_enum
   | lista_almacenamiento definicion_enum
 ;
+//tipo_basico_modificado ::= [ signo ]? [ longitud ]? tipo_basico| ’[’ IDENTIFICADOR ’]’
+tipo_basico_modificado: tipo_basico 
+    | longitud tipo_basico 
+    | signo tipo_basico 
+    | signo longitud tipo_basico 
+    | '[' IDENTIFICADOR ']'
+  ;
 
 //almacenamiento ::= 'extern'| 'static'| 'auto'| 'register'
 almacenamiento : EXTERN | STATIC | AUTO | REGISTER
@@ -114,17 +121,17 @@ definicion_struct_union : struct_union '{' lista_declaraciones_struct '}'
   | struct_union IDENTIFICADOR
 ;
 
-//struct_union ::= ’struct’ | ’union’
+//struct_union ::= 'struct' | 'union'
 struct_union: STRUCT
   | UNION
 ;
 
 //declaracion_struct ::= tipo_basico_modificado ( nombre )+ ';'| definicion_struct_union ( nombre )+ ';'
-declaracion_struct : tipo_basico_modificiado lista_nombre ';'
-  | definicion_struct_union lista_comas_nombre ';'
+declaracion_struct : tipo_basico_modificado lista_nombre ';'
+  | definicion_struct_union lista_nombre ';'
 ;
 
-//nombre ::= dato [ ’=’ elementos ]?
+//nombre ::= dato [ '=' elementos ]?
 nombre: dato
   | dato '=' elementos
 ;
@@ -135,22 +142,22 @@ lista_expresiones: '[' ']'
   | lista_expresiones '[' expresion ']'
 ;
 
-//dato ::= [ ’*’ ]* IDENTIFICADOR [ ’[’ [ expresion ]? ’]’ ]*
+//dato ::= [ '*' ]* IDENTIFICADOR [ '[' [ expresion ]? ']' ]*
 dato: IDENTIFICADOR
   | lista_asteriscos IDENTIFICADOR
   | lista_asteriscos IDENTIFICADOR lista_expresiones
 ;
 
-lista_elementos: elemento
-  |lista_elementos elemento
+lista_elementos: elementos
+  |lista_elementos elementos
 ;
 
-//elementos ::= expresion | ’{’ ( elementos )+ ’}’
+//elementos ::= expresion | '{' ( elementos )+ '}'
 elementos: expresion
   | '{' lista_elementos '}'
 ;
 
-//definicion_enum ::= ’enum’ IDENTIFICADOR  [’:’ tipo_basico_modificado ]? cuerpo_enum
+//definicion_enum ::= 'enum' IDENTIFICADOR  [':' tipo_basico_modificado ]? cuerpo_enum
 definicion_enum: ENUM IDENTIFICADOR cuerpo_enum
   | ENUM IDENTIFICADOR ';' tipo_basico_modificado cuerpo_enum
 ;
@@ -159,11 +166,11 @@ lista_declaraciones_miembro_enum: declaracion_miembro_enum
   | lista_declaraciones_miembro_enum declaracion_miembro_enum
 ;
 
-//cuerpo_enum ::= ’{’ ( declaracion_miembro_enum )+ ’}’
+//cuerpo_enum ::= '{' ( declaracion_miembro_enum )+ '}'
 cuerpo_enum: '{' lista_declaraciones_miembro_enum '}'
 ;
 
-//declaracion_miembro_enum ::= IDENTIFICADOR [ ’=’ expresion ]?
+//declaracion_miembro_enum ::= IDENTIFICADOR [ '=' expresion ]?
 declaracion_miembro_enum: IDENTIFICADOR
   | IDENTIFICADOR '=' expresion
 ;
@@ -304,7 +311,7 @@ instruccion_retorno :  RETURN ';'
 expresion_constante : 
 ENTERO 
 |REAL 
-|CADENA 
+|STRING 
 |CARACTER
 ;
 
@@ -317,13 +324,13 @@ lista_expresion expresion
 ;
 
 //expresion_funcional : IDENTIFICADOR '(' ( expresion )* ')'
-expresion_funcional : IDENTIFICADOR :'(' ')'
+expresion_funcional : IDENTIFICADOR ':' '(' ')'
   |'(' lista_expresion ')' 
 ;
 
 expresion_indexada : IDENTIFICADOR
-| expresion_indexada ’[’ expresion ’]’
-| expresion_indexada ’.’ IDENTIFICADOR
+| expresion_indexada '[' expresion ']'
+| expresion_indexada '.' IDENTIFICADOR
 | expresion_indexada PTR_ACCESO IDENTIFICADOR
 ;
 
@@ -337,16 +344,17 @@ expresion_postfija : expresion_constante
 
 expresion_prefija : expresion_postfija
 | SIZEOF expresion_prefija
-| SIZEOF ’(’ nombre_tipo ’)’
+| SIZEOF '(' nombre_tipo ')'
 | operador_unario expresion_cast
 ;
 
-operador_unario : INC | DEC | ’&’ | ’*’ | ’+’ | ’-’ | ’~’ | ’!’
+operador_unario : INC | DEC | '&' | '*' | '+' | '-' | '~' | '!'
 ;
 
 expresion_cast : expresion_prefija
-| ’(’ nombre_tipo ’)’ expresion_prefija
+| '(' nombre_tipo ')' expresion_prefija
 ;
+nombre_tipo: tipo_basico_modificado | tipo_basico_modificado lista_asteriscos ;
 
 expresion_or_logico: expresion_or_logico OR expresion_and_logico
   | expresion_and_logico
@@ -377,7 +385,7 @@ expresion_xor: expresion_xor '^' expresion_and
 ;
 
 expresion_and: expresion_and '&' expresion_desplazar
-   | expresion desplazar
+   | expresion_desplazar
 ;
 expresion_desplazar: expresion_desplazar DESPD expresion_suma_resta
   | expresion_suma_resta
@@ -395,10 +403,10 @@ expresion_multiplicacion: expresion_multiplicacion '*' expresion_potencia
 ;
 
 expresion_potencia: expresion_cast 
-  | expresion_cast '**' expresion_potencia
+  | expresion_cast POTENCIA expresion_potencia
  ;
 
-//expresion ::= expresion_or_logico [ ’?’ expresion ’:’ expresion ]?
+//expresion ::= expresion_or_logico [ '?' expresion ':' expresion ]?
 expresion: expresion_or_logico
   | expresion_or_logico '?' expresion ':' expresion
 ;
