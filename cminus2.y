@@ -45,10 +45,10 @@ definicion_funcion  : IDENTIFICADOR bloque_instrucciones { printf ("  definicion
 |declaracion_tipo lista_asteriscos IDENTIFICADOR bloque_instrucciones { printf (" declaracion_tipo definicion_funcion  -> declaracion_tipo lista_asteriscos IDENTIFICADOR bloque_instrucciones\n"); }
 ;
 
-//macros : '#''include'PATH | '#''define'IDENTIFICADOR constante
+//macros : '#' INCLUDE PATH | '#' DEFINE IDENTIFICADOR constante
 
-macros : '#' 'include' PATH { printf (" macros -> '#' 'include' PATH\n"); }
-| '#' 'define' IDENTIFICADOR constante { printf (" macros -> '#' 'define' IDENTIFICADOR constante\n"); }
+macros : '#' INCLUDE PATH { printf (" macros -> '#' 'include' PATH\n"); }
+| '#' DEFINE IDENTIFICADOR constante { printf (" macros -> '#' 'define' IDENTIFICADOR constante\n"); }
 ;
 //constante ::= ENTERO | REAL | CADENA | CARACTER
 constante : ENTERO { printf (" constante -> ENTERO\n"); }
@@ -60,19 +60,19 @@ constante : ENTERO { printf (" constante -> ENTERO\n"); }
 /*****************/
 /* DECLARACIONES */
 /*****************/
-lista_nombre:nombre { printf (" lista_nombre -> nombre;\n"); }
+lista_nombre: nombre { printf (" lista_nombre -> nombre;\n"); }
 lista_nombre ',' nombre { printf (" lista_nombre -> declaracion_tipo lista_nombre ;\n"); }
 ;
 
 //declaracion : declaracion_tipo ( nombre )* [ '#']? ';'| 'typedef'declaracion_tipo IDENTIFICADOR ';'(posible problema con la lista nombre , preguntar a alex)
 declaracion : declaracion_tipo lista_nombre ';' { printf (" declaracion -> declaracion_tipo lista_nombre ;\n"); }
-|declaracion_tipo    ';' { printf (" declaracion -> declaracion_tipo   ;\n"); }
+|declaracion_tipo  ';' { printf (" declaracion -> declaracion_tipo   ;\n"); }
 |declaracion_tipo  '#' ';' { printf (" declaracion -> declaracion_tipo lista_nombre # ;\n"); }
 |declaracion_tipo lista_nombre '#' ';' { printf (" declaracion -> declaracion_tipo lista_nombre # ;\n"); }
-|'typedef' declaracion_tipo IDENTIFICADOR ';'  { printf (" declaracion -> 'typedef' declaracion_tipo IDENTIFICADOR ';'\n"); }
+|TYPEDEF declaracion_tipo IDENTIFICADOR ';'  { printf (" declaracion -> 'typedef' declaracion_tipo IDENTIFICADOR ';'\n"); }
 ;
 
-lista_almacenamiento:almacenamiento { printf (" lista_almacenamiento -> almacenamiento ';'\n"); }
+lista_almacenamiento: almacenamiento { printf (" lista_almacenamiento -> almacenamiento ';'\n"); }
 |lista_almacenamiento almacenamiento { printf (" lista_almacenamiento -> lista_almacenamiento almacenamiento ';'\n"); }
 ;
 
@@ -81,29 +81,49 @@ lista_almacenamiento:almacenamiento { printf (" lista_almacenamiento -> almacena
 
 
 //almacenamiento ::= 'extern'| 'static'| 'auto'| 'register'
-
-almacenamiento : 'extern'| 'static'| 'auto'| 'register'
+almacenamiento : EXTERN | STATIC | AUTO | REGISTER
 ;
 
-longitud :'short'
-| 'long'
+
+longitud : SHORT
+| LONG
 ;
 
-signo :'signed'
-| 'unsigned'
+signo : SIGNED
+| UNSIGNED
 ;
 
-tipo_basico :'void'
-|'char'
-|'int'
-|'float'
-|'double'
+tipo_basico : VOID
+| CHAR
+| INT 
+| FLOAT
+| DOUBLE
+;
+
+lista_declaraciones_struct: declaracion_struct
+  | lista_declaraciones_struct declaracion_struct
+;
+
+lista_identificadores: IDENTIFICADOR
+  | lista_identificadores IDENTIFICADOR
 ;
 
 //definicion_struct_union ::= struct_union [ IDENTIFICADOR ]? '{'[ declaracion_struct ]+ '}'| struct_union IDENTIFICADOR
+definicion_struct_union : struct_union '{' lista_declaraciones_struct '}'
+  | struct_union lista_identificadores '{' lista_declaraciones_struct '}'
+  | struct_union IDENTIFICADOR
+;
+
+
+
+lista_comas_nombre: nombre
+  | lista_comas_nombre ',' nombre
+;
 
 //declaracion_struct ::= tipo_basico_modificado ( nombre )+ ';'| definicion_struct_union ( nombre )+ ';'
-
+declaracion_struct : tipo_basico_modificiado lista_comas_nombre ';'
+  | definicion_struct_union lista_comas_nombre ';'
+;
 
 
 /*****************/
