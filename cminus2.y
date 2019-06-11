@@ -77,23 +77,26 @@ lista_almacenamiento: almacenamiento { printf (" lista_almacenamiento -> almacen
 ;
 
 //declaracion_tipo ::= [ almacenamiento ]* tipo_basico_modificado| [ almacenamiento ]* definicion_struct_union | [ almacenamiento ]* definicion_enum
-declaracion_tipo : tipo_basico_modificado
-  | lista_almacenamiento tipo_basico_modificado
-  | definicion_struct_union
-  | lista_almacenamiento  definicion_struct_union
-  | definicion_enum
-  | lista_almacenamiento definicion_enum
+declaracion_tipo : tipo_basico_modificado { printf (" declaracion_tipo -> tipo_basico_modificado \n"); }
+  | lista_almacenamiento tipo_basico_modificado { printf (" declaracion_tipo -> lista_almacenamiento lista_almacenamiento \n"); }
+  | definicion_struct_union { printf (" declaracion_tipo -> definicion_struct_union \n"); }
+  | lista_almacenamiento  definicion_struct_union { printf (" declaracion_tipo -> lista_almacenamiento \n"); }
+  | definicion_enum { printf (" declaracion_tipo -> definicion_enum \n"); }
+  | lista_almacenamiento definicion_enum { printf (" declaracion_tipo -> lista_almacenamiento definicion_enum \n"); }
 ;
 //tipo_basico_modificado ::= [ signo ]? [ longitud ]? tipo_basico| ’[’ IDENTIFICADOR ’]’
-tipo_basico_modificado: tipo_basico 
-    | longitud tipo_basico 
-    | signo tipo_basico 
-    | signo longitud tipo_basico 
-    | '[' IDENTIFICADOR ']'
+tipo_basico_modificado: tipo_basico { printf (" tipo_basico_modificado -> tipo_basico \n"); }
+    | longitud tipo_basico { printf (" tipo_basico_modificado ->  longitud tipo_basico \n"); }
+    | signo tipo_basico { printf (" tipo_basico_modificado -> signo tipo_basico \n"); }
+    | signo longitud tipo_basico { printf (" tipo_basico_modificado -> signo longitud tipo_basico \n"); }
+    | '[' IDENTIFICADOR ']' { printf (" tipo_basico_modificado -> '[' IDENTIFICADOR ']' \n"); }
   ;
 
 //almacenamiento ::= 'extern'| 'static'| 'auto'| 'register'
-almacenamiento : EXTERN | STATIC | AUTO | REGISTER
+almacenamiento : EXTERN { printf (" almacenamiento -> EXTERN \n"); }
+    | STATIC { printf (" almacenamiento -> STATIC \n"); }
+    | AUTO { printf (" almacenamiento -> AUTO \n"); }
+    | REGISTER { printf (" almacenamiento -> REGISTER \n"); }
 ;
 
 longitud : SHORT
