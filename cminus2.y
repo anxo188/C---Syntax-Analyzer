@@ -99,23 +99,23 @@ almacenamiento : EXTERN { printf (" almacenamiento -> EXTERN \n"); }
     | REGISTER { printf (" almacenamiento -> REGISTER \n"); }
 ;
 
-longitud : SHORT
-| LONG
+longitud : SHORT { printf (" longitud -> SHORT  \n"); }
+| LONG { printf (" longitud -> LONG  \n"); }
 ;
 
-signo : SIGNED
-| UNSIGNED
+signo : SIGNED { printf (" signo -> SIGNED  \n"); }
+| UNSIGNED { printf (" signo -> UNSIGNED  \n"); }
 ;
 
-tipo_basico : VOID
-| CHAR
-| INT 
-| FLOAT
-| DOUBLE
+tipo_basico : VOID { printf (" tipo_basico -> VOID  \n"); }
+| CHAR { printf (" tipo_basico -> CHAR  \n"); }
+| INT  { printf (" tipo_basico -> INT  \n"); }
+| FLOAT { printf (" tipo_basico -> FLOAT  \n"); }
+| DOUBLE { printf (" tipo_basico -> DOUBLE  \n"); }
 ;
 
-lista_declaraciones_struct: declaracion_struct
-  | lista_declaraciones_struct declaracion_struct
+lista_declaraciones_struct: declaracion_struct  { printf (" lista_declaraciones_struct -> declaracion_struct  \n"); }
+  | lista_declaraciones_struct declaracion_struct { printf (" lista_declaraciones_struct -> declaracion_struct  \n"); }
 ;
 
 //definicion_struct_union ::= struct_union [ IDENTIFICADOR ]? '{'[ declaracion_struct ]+ '}'| struct_union IDENTIFICADOR
@@ -124,29 +124,32 @@ definicion_struct_union : struct_union '{' lista_declaraciones_struct '}'
   | struct_union IDENTIFICADOR
 ;
 
+
+
 //struct_union ::= 'struct' | 'union'
-struct_union: STRUCT
-  | UNION
+struct_union: STRUCT { printf (" struct_union -> STRUCT \n"); }
+  | UNION { printf (" struct_union -> UNION \n"); }
 ;
 
 //declaracion_struct ::= tipo_basico_modificado ( nombre )+ ';'| definicion_struct_union ( nombre )+ ';'
-declaracion_struct : tipo_basico_modificado lista_nombre ';'
-  | definicion_struct_union lista_nombre ';'
+declaracion_struct : tipo_basico_modificado lista_nombre ';'  { printf (" declaracion_struct -> tipo_basico_modificado lista_nombre \n"); }
+  | definicion_struct_union lista_nombre ';'{ printf (" declaracion_struct -> definicion_struct_union lista_nombre  \n"); }
 ;
 
 //nombre ::= dato [ '=' elementos ]?
-nombre: dato
-  | dato '=' elementos
+nombre: dato { printf (" nombre -> dato  \n")}
+  | dato '=' elementos { printf (" nombre -> dato '=' elementos  \n")}
 ;
 
-lista_expresiones: '[' ']'
-  | '[' expresion ']'
-  | lista_expresiones '[' ']'
-  | lista_expresiones '[' expresion ']'
-;
+lista_expresiones: '[' ']' { printf (" lista_expresiones ->'[' ']'  \n")}
+  | '[' expresion ']' { printf (" lista_expresiones -> '[' expresion ']'  \n")}
+  | lista_expresiones '[' ']' { printf (" lista_expresiones -> lista_expresiones '[' ']'  \n")}
+  | lista_expresiones '[' expresion ']' { printf (" lista_expresiones -> lista_expresiones '[' expresion ']'   \n")}
+; 
 
 //dato ::= [ '*' ]* IDENTIFICADOR [ '[' [ expresion ]? ']' ]*
-dato: IDENTIFICADOR
+dato: IDENTIFICADOR { printf ("dato ->IDENTIFICADOR    \n"); }
+;
   | lista_asteriscos IDENTIFICADOR
   | lista_asteriscos IDENTIFICADOR lista_expresiones
 ;
@@ -391,6 +394,7 @@ expresion_and: expresion_and '&' expresion_desplazar
    | expresion_desplazar
 ;
 expresion_desplazar: expresion_desplazar DESPD expresion_suma_resta
+  | expresion_desplazar DESPI expresion_suma_resta
   | expresion_suma_resta
 ;
 

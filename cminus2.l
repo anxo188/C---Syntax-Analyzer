@@ -1,7 +1,8 @@
 %{
 
-        #include <stdlib.h>
+    #include <stdlib.h>
 	#include <stdio.h>
+	#include <string.h>
 	#include "cminus2.tab.h"
 	unsigned int linea = 1;
 %}
@@ -32,7 +33,7 @@ DELIMITADORES [?:;,(){}]
 "else" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return ELSE; }
 "enum" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return ENUM; }
 "extern" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return EXTERN; }
-"float"{printf("nlinea %d, Palabra reservada: %s",linea,yytext); return FLOAT; }
+"float" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return FLOAT; }
 "for" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return FOR; }
 "goto" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return GOTO; }
 "if" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return IF; }
@@ -53,11 +54,11 @@ DELIMITADORES [?:;,(){}]
 "while" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return WHILE; }
 "sizeof" {printf("\nlinea %d, Operador: %s",linea,yytext); return(SIZEOF);}
 {IDENTIFICADOR} {printf("\nlinea %d, Identificador: ",linea); return(IDENTIFICADOR);}
-{INT} {printf("\nlinea %d, Constante Entera: %s",linea,*yytext); return(ENTERO);}
-{FLOAT} {printf("\nlinea %d, Constante Real : %s",linea,*yytext); return(REAL);}
-{MANTISA} {printf("\nlinea %d, Constante Real : %s",linea,*yytext); return(REAL);}
-{DELIMITADORES} {printf("\nlinea %d, Delimitador: %s",linea,yytext); return *yytext};
-{PATH} {printf("\nlinea %d, PATH: %s",linea,yytext); return(PATH)};
+{INT} {printf("\nlinea %d, Constante Entera: %s",linea,yytext); return(ENTERO);}
+{FLOAT} {printf("\nlinea %d, Constante Real : %s",linea,yytext); return(REAL);}
+{MANTISA} {printf("\nlinea %d, Constante Real : %s",linea,yytext); return(REAL);}
+{DELIMITADORES} {printf("\nlinea %d, Delimitador: %s",linea,yytext); return *yytext;}
+{PATH} {printf("\nlinea %d, PATH: %s",linea,yytext); return(PATH);}
 "\+="	{printf("\nlinea %d, Operador: %s",linea,yytext); return(SUMA_ASIG); }
 "-="	{printf("\nlinea %d, Operador: %s",linea,yytext); return(RESTA_ASIG); }
 "\*="	{printf("\nlinea %d, Operador: %s",linea,yytext); return(MULT_ASIG); }
@@ -80,16 +81,17 @@ DELIMITADORES [?:;,(){}]
 "\|\|"	{printf("\nlinea %d, Operador: %s",linea,yytext); return(OR); }
 "-\>"	{printf("\nlinea %d, Operador: %s",linea,yytext); return(PTR_ACCESO);}
 "**"	{printf("\nlinea %d, Operador: %s",linea,yytext); return(POTENCIA);}
+
 {OPERADOR} {printf("\nlinea %d, Operador: ",linea); return(*yytext);}
 {CARACTER} {printf("\nlinea %d, Caracter: %s",linea,yytext);  return(CARACTER);}
-{CADENA} {printf("\nlinea %d, Caracter: %s",linea,yytext);  return(CADENA);}
-{SALTO_LINEA} numeroLinea++;
+{CADENA} {printf("\nlinea %d, Caracter: %s",linea,yytext);  return(STRING);}
+{SALTO_LINEA} linea++;
 "/*" BEGIN(Comentario);
  "\/\/" BEGIN(Comentario_Linea);
-<Comentario>\n {numeroLinea++;}
+<Comentario>\n {linea++;}
 <Comentario>. ;
 <Comentario>"*/" {BEGIN(INITIAL) ;}
-<Comentario_Linea>{SALTO_LINEA}     { BEGIN(INITIAL); ++numeroLinea; }
+<Comentario_Linea>{SALTO_LINEA}     { BEGIN(INITIAL); ++linea; }
 ".*" printf("\n Línea %d, token no reconocido: %s \n", linea , yytext);
 %%
 
