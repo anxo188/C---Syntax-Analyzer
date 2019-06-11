@@ -25,9 +25,10 @@
 /* PROGRAMA */
 /************/
 
-lista_bloque :bloque           { printf ("  lista_bloque  -> bloque\n"); }
+lista_bloque : bloque           { printf ("  lista_bloque  -> bloque\n"); }
 |lista_bloque bloque           { printf ("  lista_bloque  -> lista_bloque bloque \n"); }
 ;
+
 //programa ::= [ bloque ]+
 programa : lista_bloque { printf ("  programa  -> lista_bloque\n"); }
 ;
@@ -61,7 +62,7 @@ constante : ENTERO { printf (" constante -> ENTERO\n"); }
 /* DECLARACIONES */
 /*****************/
 lista_nombre: nombre { printf (" lista_nombre -> nombre;\n"); }
-lista_nombre ',' nombre { printf (" lista_nombre -> declaracion_tipo lista_nombre ;\n"); }
+|lista_nombre ',' nombre { printf (" lista_nombre -> declaracion_tipo lista_nombre ;\n"); }
 ;
 
 //declaracion : declaracion_tipo ( nombre )* [ '#']? ';'| 'typedef'declaracion_tipo IDENTIFICADOR ';'(posible problema con la lista nombre , preguntar a alex)
@@ -137,19 +138,18 @@ declaracion_struct : tipo_basico_modificado lista_nombre ';'  { printf (" declar
 ;
 
 //nombre ::= dato [ '=' elementos ]?
-nombre: dato { printf (" nombre -> dato  \n")}
-  | dato '=' elementos { printf (" nombre -> dato '=' elementos  \n")}
+nombre: dato { printf (" nombre -> dato  \n");}
+  | dato '=' elementos { printf (" nombre -> dato '=' elementos  \n");}
 ;
 
-lista_expresiones: '[' ']' { printf (" lista_expresiones ->'[' ']'  \n")}
-  | '[' expresion ']' { printf (" lista_expresiones -> '[' expresion ']'  \n")}
-  | lista_expresiones '[' ']' { printf (" lista_expresiones -> lista_expresiones '[' ']'  \n")}
-  | lista_expresiones '[' expresion ']' { printf (" lista_expresiones -> lista_expresiones '[' expresion ']'   \n")}
+lista_expresiones: '[' ']' { printf (" lista_expresiones ->'[' ']'  \n");}
+  | '[' expresion ']' { printf (" lista_expresiones -> '[' expresion ']'  \n");}
+  | lista_expresiones '[' ']' { printf (" lista_expresiones -> lista_expresiones '[' ']'  \n");}
+  | lista_expresiones '[' expresion ']' { printf (" lista_expresiones -> lista_expresiones '[' expresion ']'   \n");}
 ; 
 
 //dato ::= [ '*' ]* IDENTIFICADOR [ '[' [ expresion ]? ']' ]*
 dato: IDENTIFICADOR { printf ("dato ->IDENTIFICADOR    \n"); }
-;
   | lista_asteriscos IDENTIFICADOR
   | lista_asteriscos IDENTIFICADOR lista_expresiones
 ;
@@ -218,7 +218,8 @@ bloque_instrucciones : '{' '}'
 ;
 
 //instruccion_expresion ::= expresion_funcional ';'| asignacion ';'
-instruccion_expresion : expresion_funcional ';'| asignacion ';'
+instruccion_expresion : expresion_funcional ';'
+| asignacion ';'
 ;
 
 //asignacion ::= expresion_indexada operador_asignacion expresion
@@ -239,9 +240,6 @@ operador_asignacion : '='
   | OR_ASIG
 ;
 
-lista_else: ELSE instruccion
-  | ELSE instruccion lista_else
-;
 
 lista_instruccion_caso: instruccion_caso
   | lista_instruccion_caso instruccion_caso
@@ -251,9 +249,9 @@ lista_instruccion_caso: instruccion_caso
 instruccion_bifurcacion ::= 'if''('expresion ')'instruccion [ 'else'instruccion ]?
   | SWITCH '('expresion ')''{'[ instruccion_caso ]+ '}'
 */
-instruccion_bifurcacion : IF '(' expresion ')'
-  | IF '(' expresion ')' instruccion lista_else 
-  | SWITCH '('expresion ')''{'lista_instruccion_caso '}'
+instruccion_bifurcacion : IF '(' expresion ')' instruccion
+  | IF '(' expresion ')' instruccion ELSE instruccion
+  | SWITCH '('expresion ')' '{' lista_instruccion_caso '}'
 ;
 
 /*
@@ -301,7 +299,7 @@ instruccion_salto : GOTO IDENTIFICADOR ';'| CONTINUE ';'| BREAK ';'
 /*
 instruccion_destino_salto ::= IDENTIFICADOR ':'instruccion ';'
 */
-instruccion_destino_salto : IDENTIFICADOR ':'instruccion ';'
+instruccion_destino_salto : IDENTIFICADOR ':' instruccion ';'
 ;
 
 /*
@@ -325,13 +323,13 @@ expresion_parentesis :
 '(' expresion ')'
 ;
 
-lista_expresion:expresion
-lista_expresion expresion
+lista_expresion: expresion
+|lista_expresion ','  expresion 
 ;
 
 //expresion_funcional : IDENTIFICADOR '(' ( expresion )* ')'
-expresion_funcional : IDENTIFICADOR ':' '(' ')'
-  |'(' lista_expresion ')' 
+expresion_funcional : IDENTIFICADOR  '(' ')'
+  |IDENTIFICADOR '(' lista_expresion ')' 
 ;
 
 expresion_indexada : IDENTIFICADOR
@@ -360,7 +358,9 @@ operador_unario : INC | DEC | '&' | '*' | '+' | '-' | '~' | '!'
 expresion_cast : expresion_prefija
 | '(' nombre_tipo ')' expresion_prefija
 ;
-nombre_tipo: tipo_basico_modificado | tipo_basico_modificado lista_asteriscos ;
+
+nombre_tipo: tipo_basico_modificado 
+| tipo_basico_modificado lista_asteriscos ;
 
 expresion_or_logico: expresion_or_logico OR expresion_and_logico
   | expresion_and_logico
@@ -371,7 +371,7 @@ expresion_and_logico: expresion_and_logico AND expresion_igual_distinto
 ;
 
 expresion_igual_distinto: expresion_igual_distinto EQ expresion_mayor_menor
-  | expresion NEQ expresion_mayor_menor
+  | expresion_igual_distinto NEQ expresion_mayor_menor
   | expresion_mayor_menor
 ;
 
@@ -393,6 +393,7 @@ expresion_xor: expresion_xor '^' expresion_and
 expresion_and: expresion_and '&' expresion_desplazar
    | expresion_desplazar
 ;
+
 expresion_desplazar: expresion_desplazar DESPD expresion_suma_resta
   | expresion_desplazar DESPI expresion_suma_resta
   | expresion_suma_resta
@@ -402,6 +403,7 @@ expresion_suma_resta: expresion_suma_resta '+' expresion_multiplicacion
   | expresion_suma_resta '-' expresion_multiplicacion
   | expresion_multiplicacion
 ;
+
 
 expresion_multiplicacion: expresion_multiplicacion '*' expresion_potencia
   | expresion_multiplicacion '/' expresion_potencia
@@ -413,9 +415,14 @@ expresion_potencia: expresion_cast
   | expresion_cast POTENCIA expresion_potencia
  ;
 
-//expresion ::= expresion_or_logico [ '?' expresion ':' expresion ]?
-expresion: expresion_or_logico
-  | expresion_or_logico '?' expresion ':' expresion
+
+
+expresion_logica: expresion_or_logico
+;
+
+//expresion ::= expresion_logica [ '?' expresion ':' expresion ]?
+expresion: expresion_logica
+  | expresion_logica '?' expresion ':' expresion
 ;
 
 %%
