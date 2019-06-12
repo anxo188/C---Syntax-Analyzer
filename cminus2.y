@@ -1,3 +1,4 @@
+
 %{
   #include <stdlib.h>
   #include <stdio.h>
@@ -25,18 +26,21 @@
 /* PROGRAMA */
 /************/
 
-lista_bloque : bloque           { printf ("  lista_bloque  -> bloque\n"); }
-|lista_bloque bloque           { printf ("  lista_bloque  -> lista_bloque bloque \n"); }
-;
 
 //programa ::= [ bloque ]+
 programa : lista_bloque { printf ("  programa  -> lista_bloque\n"); }
 ;
+
+lista_bloque : bloque           { printf ("  lista_bloque  -> bloque\n"); }
+|lista_bloque bloque           { printf ("  lista_bloque  -> lista_bloque bloque \n"); }
+;
+
 //bloque ::= definicion_funcion| declaracion| macros
 bloque : definicion_funcion
 | declaracion
 | macros
 ;
+
 lista_asteriscos: '*' { printf ("lista_asteriscos  -> *\n"); }
 |lista_asteriscos '*' { printf ("lista_asteriscos  -> lista_asteriscos *\n"); }
 ;
@@ -155,7 +159,7 @@ dato: IDENTIFICADOR { printf ("dato ->IDENTIFICADOR    \n"); }
 ;
 
 lista_elementos: elementos
-  |lista_elementos elementos
+  |lista_elementos ',' elementos
 ;
 
 //elementos ::= expresion | '{' ( elementos )+ '}'
@@ -245,19 +249,19 @@ lista_instruccion_caso: instruccion_caso
   | lista_instruccion_caso instruccion_caso
 ;
  
-/*
-instruccion_bifurcacion ::= 'if''('expresion ')'instruccion [ 'else'instruccion ]?
-  | SWITCH '('expresion ')''{'[ instruccion_caso ]+ '}'
-*/
-instruccion_bifurcacion : IF '(' expresion ')' instruccion
-  | IF '(' expresion ')' instruccion ELSE instruccion
+
+//instruccion_bifurcacion ::= 'if''('expresion ')'instruccion [ 'else'instruccion ]?| SWITCH '('expresion ')''{'[ instruccion_caso ]+ '}'
+opciones: instruccion | instruccion ELSE instruccion ;
+
+instruccion_bifurcacion :IF '(' expresion ')' opciones
   | SWITCH '('expresion ')' '{' lista_instruccion_caso '}'
 ;
 
-/*
-instruccion_caso ::= 'case'expresion ':'instruccion
-  | 'default'':'instruccion
-*/
+
+
+
+//instruccion_caso ::= 'case'expresion ':'instruccion| 'default'':'instruccion
+
 instruccion_caso : CASE expresion ':' instruccion
   | DEFAULT ':' instruccion
 ;  
@@ -312,6 +316,7 @@ instruccion_retorno :  RETURN ';'
 /***************/
 /* EXPRESIONES */
 /***************/
+
 expresion_constante : 
 ENTERO 
 |REAL 
@@ -319,8 +324,7 @@ ENTERO
 |CARACTER
 ;
 
-expresion_parentesis :
-'(' expresion ')'
+expresion_parentesis :'(' expresion ')'
 ;
 
 lista_expresion: expresion
@@ -352,7 +356,14 @@ expresion_prefija : expresion_postfija
 | operador_unario expresion_cast
 ;
 
-operador_unario : INC | DEC | '&' | '*' | '+' | '-' | '~' | '!'
+operador_unario :INC
+|DEC
+|'&'
+|'*'
+|'+'
+|'-'
+|'~'
+|'!'
 ;
 
 expresion_cast : expresion_prefija
