@@ -124,16 +124,16 @@ lista_declaraciones_struct: declaracion_struct  { printf (" lista_declaraciones_
   | lista_declaraciones_struct declaracion_struct { printf (" lista_declaraciones_struct -> declaracion_struct  \n"); }
 ;
 
-//definicion_struct_union ::= struct_union [ IDENTIFICADOR ]? '{'[ declaracion_struct ]+ '}'| struct_union IDENTIFICADOR
-definicion_struct_union : struct_union '{' lista_declaraciones_struct '}'
-  | struct_union IDENTIFICADOR '{' lista_declaraciones_struct '}'
-  | struct_union IDENTIFICADOR
+//definicion_struct_union ::= struct_union [ IDENTIFICADOR ]? '{'[ declaracion_struct ]+ '}'| struct_union IDENTIFICADOR 
+definicion_struct_union : struct_union '{' lista_declaraciones_struct '}'{ printf (" definicion_struct_union : struct_union '{' lista_declaraciones_struct '}' \n"); }
+  | struct_union IDENTIFICADOR '{' lista_declaraciones_struct '}' { printf (" definicion_struct_union : struct_union IDENTIFICADOR '{' lista_declaraciones_struct '}' \n"); }
+  | struct_union IDENTIFICADOR { printf (" definicion_struct_union :struct_union IDENTIFICADOR \n"); }
 ;
 
 
 
 //struct_union ::= 'struct' | 'union'
-struct_union: STRUCT { printf (" struct_union -> STRUCT \n"); }
+struct_union: STRUCT { printf (" struct_union -> STRUCT \n"); } 
   | UNION { printf (" struct_union -> UNION \n"); }
 ;
 
@@ -155,35 +155,37 @@ lista_expresiones: '[' ']' { printf (" lista_expresiones ->'[' ']'  \n");}
 
 //dato ::= [ '*' ]* IDENTIFICADOR [ '[' [ expresion ]? ']' ]*
 dato: IDENTIFICADOR { printf ("dato ->IDENTIFICADOR    \n"); }
-  | lista_asteriscos IDENTIFICADOR
-  | lista_asteriscos IDENTIFICADOR lista_expresiones
+  | IDENTIFICADOR lista_expresiones { printf ("dato -> IDENTIFICADOR lista_expresiones  \n"); }
+;
+  | lista_asteriscos IDENTIFICADOR  { printf ("dato ->lista_asteriscos IDENTIFICADOR   \n"); }
+  | lista_asteriscos IDENTIFICADOR lista_expresiones  { printf ("dato ->lista_asteriscos IDENTIFICADOR lista_expresiones  \n"); }
 ;
 
-lista_elementos: elementos
-  |lista_elementos ',' elementos
+lista_elementos: elementos { printf ("lista_elementos ->elementos  \n"); }
+  |lista_elementos ',' elementos { printf ("lista_elementos ->lista_elementos ',' elementos  \n"); }
 ;
 
 //elementos ::= expresion | '{' ( elementos )+ '}'
-elementos: expresion
-  | '{' lista_elementos '}'
+elementos: expresion { printf ("elementos->expresion \n"); }
+  | '{' lista_elementos '}' { printf ("elementos: '{' lista_elementos '}' \n"); }
 ;
 
 //definicion_enum ::= 'enum' IDENTIFICADOR  [':' tipo_basico_modificado ]? cuerpo_enum
-definicion_enum: ENUM IDENTIFICADOR cuerpo_enum
-  | ENUM IDENTIFICADOR ':' tipo_basico_modificado cuerpo_enum
+definicion_enum: ENUM IDENTIFICADOR cuerpo_enum { printf ("definicion_enum->ENUM IDENTIFICADOR cuerpo_enum  \n"); }
+  | ENUM IDENTIFICADOR ':' tipo_basico_modificado cuerpo_enum { printf ("definicion_enum->ENUM IDENTIFICADOR ':' tipo_basico_modificado cuerpo_enum  \n"); }
 ;
 
-lista_declaraciones_miembro_enum: declaracion_miembro_enum
+lista_declaraciones_miembro_enum: declaracion_miembro_enum { printf ("definicion_enum -> ENUM IDENTIFICADOR ':' tipo_basico_modificado cuerpo_enum  \n"); }
   | lista_declaraciones_miembro_enum ',' declaracion_miembro_enum
 ;
 
 //cuerpo_enum ::= '{' ( declaracion_miembro_enum )+ '}'
-cuerpo_enum: '{' lista_declaraciones_miembro_enum '}'
+cuerpo_enum: '{' lista_declaraciones_miembro_enum '}' { printf (" cuerpo_enum->'{' lista_declaraciones_miembro_enum '}' \n"); }
 ;
 
 //declaracion_miembro_enum ::= IDENTIFICADOR [ '=' expresion ]?
-declaracion_miembro_enum: IDENTIFICADOR
-  | IDENTIFICADOR '=' expresion
+declaracion_miembro_enum: IDENTIFICADOR  { printf (" declaracion_miembro_enum->IDENTIFICADOR \n"); }
+  | IDENTIFICADOR '=' expresion    { printf (" declaracion_miembro_enum->IDENTIFICADOR '=' expresion  \n"); }
 ;
 
 /*****************/
@@ -191,7 +193,7 @@ declaracion_miembro_enum: IDENTIFICADOR
 /*****************/
 /*
 instruccion ::= bloque_instrucciones
-  | instruccion_expresion
+  | instruccion_expresion 
   | instruccion_bifurcacion
   | instruccion_bucle
   | instruccion_salto
@@ -199,63 +201,64 @@ instruccion ::= bloque_instrucciones
   | instruccion_retorno
   | ';'
 */
-instruccion : bloque_instrucciones
-  | instruccion_expresion
-  | instruccion_bifurcacion
-  | instruccion_bucle
-  | instruccion_salto
-  | instruccion_destino_salto
-  | instruccion_retorno
+instruccion : bloque_instrucciones { printf (" instruccion -> bloque_instrucciones  \n"); }
+  | instruccion_expresion { printf (" instruccion -> instruccion_expresion  \n"); }
+  | instruccion_bifurcacion  { printf (" instruccion -> instruccion_bifurcacion  \n"); }
+  | instruccion_bucle { printf (" instruccion -> instruccion_bucle  \n"); }
+  | instruccion_salto { printf (" instruccion -> instruccion_salto  \n"); }
+  | instruccion_destino_salto { printf (" instruccion -> instruccion_destino_salto  \n"); }
+  | instruccion_retorno { printf (" instruccion ->  instruccion_retorno  \n"); }
   | ';'
 ;
 
-lista_declaraciones: declaracion
-  | lista_declaraciones declaracion;
+lista_declaraciones: declaracion { printf (" lista_declaraciones ->  declaracion  \n"); }
+  | lista_declaraciones declaracion   { printf (" lista_declaraciones ->  lista_declaraciones declaracion  \n"); }
 
-lista_instrucciones: instruccion
-  | lista_instrucciones instruccion;
+lista_instrucciones: instruccion { printf (" lista_instrucciones ->  instruccion  \n"); }
+  | lista_instrucciones instruccion { printf (" lista_instrucciones ->  lista_instrucciones instruccion  \n"); }
 
 //bloque_instrucciones ::= '{'[ declaracion ]* [ instruccion ]* '}'
-bloque_instrucciones : '{' '}' 
-  | '{' lista_declaraciones '}'
-  | '{' lista_instrucciones '}'
-  | '{' lista_declaraciones lista_instrucciones '}'
+bloque_instrucciones : '{' '}'  { printf (" bloque_instrucciones ->  '{' '}'   \n"); }
+  | '{' lista_declaraciones '}'  { printf (" bloque_instrucciones ->  '{' lista_declaraciones '}'   \n"); }
+  | '{' lista_instrucciones '}'  { printf (" bloque_instrucciones ->  '{' lista_instrucciones '}'    \n"); }
+  | '{' lista_declaraciones lista_instrucciones '}' { printf (" bloque_instrucciones ->  '{' lista_declaraciones lista_instrucciones '}'     \n"); }
 ;
 
-//instruccion_expresion ::= expresion_funcional ';'| asignacion ';'
-instruccion_expresion : expresion_funcional ';'
-| asignacion ';'
+//instruccion_expresion ::= expresion_funcional ';'| asignacion ';' 
+instruccion_expresion : expresion_funcional ';'{ printf ("  instruccion_expresion : expresion_funcional ';' '}'     \n"); }
+| asignacion ';' { printf (" bloque_instrucciones ->  '{' instruccion_expresion :asignacion ';' '}'     \n"); }
 ;
 
 //asignacion ::= expresion_indexada operador_asignacion expresion
-asignacion : expresion_indexada operador_asignacion expresion
+asignacion : expresion_indexada operador_asignacion expresion { printf (" asignacion : expresion_indexada operador_asignacion expresion  ';' '}'     \n"); }
 ;
 
 //operador_asignacion ::= '='| '*='| '/='| '%='| '+='| '-='| '<<='| '>>='| '&='| '^='| '|='
 operador_asignacion : '=' 
-  | MULT_ASIG 
-  | DIV_ASIG 
-  | MOD_ASIG 
-  | SUMA_ASIG 
-  | RESTA_ASIG 
-  | DESPI_ASIG
-  | DESPD_ASIG 
-  | AND_ASIG 
-  | XOR_ASIG 
-  | OR_ASIG
+  | MULT_ASIG { printf (" operador_asignacion ->  MULT_ASIG ';' '}'     \n"); }
+  | DIV_ASIG { printf (" operador_asignacion ->  DIV_ASIG ';' '}'     \n"); }
+  | MOD_ASIG { printf (" operador_asignacion ->  MOD_ASIG ';' '}'     \n"); }
+  | SUMA_ASIG { printf (" operador_asignacion ->  SUMA_ASIG ';' '}'     \n"); }
+  | RESTA_ASIG { printf (" operador_asignacion ->  RESTA_ASIG ';' '}'     \n"); }
+  | DESPI_ASIG { printf (" operador_asignacion ->  DESPI_ASIG ';' '}'     \n"); }
+  | DESPD_ASIG { printf (" operador_asignacion ->  DESPD_ASIG ';' '}'     \n"); }
+  | AND_ASIG { printf (" operador_asignacion ->  AND_ASIG ';' '}'     \n"); }
+  | XOR_ASIG { printf (" operador_asignacion ->  XOR_ASIG ';' '}'     \n"); }
+  | OR_ASIG { printf (" operador_asignacion ->  OR_ASIG ';' '}'     \n"); }
 ;
 
 
-lista_instruccion_caso: instruccion_caso
-  | lista_instruccion_caso instruccion_caso
+lista_instruccion_caso: instruccion_caso { printf (" lista_instruccion_caso: instruccion_caso    \n"); }
+  | lista_instruccion_caso instruccion_caso { printf (" lista_instruccion_caso:  lista_instruccion_caso instruccion_caso   \n"); }
 ;
  
 
 //instruccion_bifurcacion ::= 'if''('expresion ')'instruccion [ 'else'instruccion ]?| SWITCH '('expresion ')''{'[ instruccion_caso ]+ '}'
-opciones: instruccion | instruccion ELSE instruccion ;
+opciones: instruccion { printf (" opciones: instruccion   \n"); }
+ | instruccion ELSE instruccion { printf (" opciones: instruccion ELSE instruccion   \n"); } ;
 
-instruccion_bifurcacion :IF '(' expresion ')' opciones
-  | SWITCH '('expresion ')' '{' lista_instruccion_caso '}'
+instruccion_bifurcacion :IF '(' expresion ')' opciones { printf ("instruccion_bifurcacion : IF '(' expresion ')' opciones   \n"); } ;
+  | SWITCH '('expresion ')' '{' lista_instruccion_caso '}' { printf ("instruccion_bifurcacion :  SWITCH '('expresion ')' '{' lista_instruccion_caso '}'  \n"); } ;
 ;
 
 
@@ -263,42 +266,42 @@ instruccion_bifurcacion :IF '(' expresion ')' opciones
 
 //instruccion_caso ::= 'case'expresion ':'instruccion| 'default'':'instruccion
 
-instruccion_caso : CASE expresion ':' instruccion
-  | DEFAULT ':' instruccion
+instruccion_caso : CASE expresion ':' instruccion { printf ("instruccion_caso : CASE expresion ':' instruccion  \n"); } 
+  | DEFAULT ':' instruccion  { printf ("instruccion_caso : DEFAULT ':' instruccion   \n"); } 
 ;  
 
-lista_definicion_asignacion: definicion_asignacion
-  | lista_definicion_asignacion','definicion_asignacion
+lista_definicion_asignacion: definicion_asignacion { printf ("lista_definicion_asignacion: definicion_asignacion  \n"); } 
+  | lista_definicion_asignacion','definicion_asignacion { printf ("lista_definicion_asignacion: lista_definicion_asignacion','definicion_asignacion  \n"); } 
 ;
 
 /*
-instruccion_bucle ::= 'while''('expresion ')'instruccion
+instruccion_bucle ::= 'while''('expresion ')'instruccion 
   | 'do'instruccion 'while''( expresion ')'';'
   | 'for''('( definicion_asignacion )* ';'expresion ';'expresion ')'instruccion
   | 'for''('[ declaracion_tipo [ '*']* ]? IDENTIFICADOR ';'expresion ')'instruccioN
 */
 
-instruccion_bucle : WHILE '('expresion ')' instruccion
-  | DO instruccion WHILE '(' expresion ')' ';'
-  | FOR '('lista_definicion_asignacion ';' expresion ';'expresion ')'instruccion
-  | FOR '(' ';' expresion ';'expresion ')' instruccion
-  | FOR '('IDENTIFICADOR ';'expresion ')' instruccion
-  | FOR '('declaracion_tipo lista_asteriscos IDENTIFICADOR ';'expresion ')'instruccion //lista_asteriscos declarada arriba
+instruccion_bucle : WHILE '('expresion ')' instruccion { printf ("instruccion_bucle : WHILE '('expresion ')' instruccion  \n"); } 
+  | DO instruccion WHILE '(' expresion ')' ';' { printf ("instruccion_bucle : DO instruccion WHILE '(' expresion ')' ';'  \n"); } 
+  | FOR '('lista_definicion_asignacion ';' expresion ';'expresion ')'instruccion { printf ("FOR '('lista_definicion_asignacion ';' expresion ';'expresion ')'instruccion   \n"); } 
+  | FOR '(' ';' expresion ';'expresion ')' instruccion { printf ("instruccion_bucle : FOR '(' ';' expresion ';'expresion ')' instruccion    \n"); } 
+  | FOR '('IDENTIFICADOR ';'expresion ')' instruccion { printf ("instruccion_bucle : FOR '('IDENTIFICADOR ';'expresion ')' instruccion    \n"); } 
+  | FOR '('declaracion_tipo lista_asteriscos IDENTIFICADOR ';'expresion ')'instruccion //lista_asteriscos declarada arriba { printf ("instruccion_bucle : FOR '('declaracion_tipo lista_asteriscos IDENTIFICADOR ';'expresion ')'instruccion   \n"); } 
 ;
 
 /*
 definicion_asignacion ::= asignacion
-  | declaracion_tipo [ '*']* expresion_indexada '='expresion
+  | declaracion_tipo [ '*']* expresion_indexada '='expresion 
 */
-definicion_asignacion : asignacion
-  | declaracion_tipo expresion_indexada '='expresion
-  | declaracion_tipo lista_asteriscos expresion_indexada '='expresion
+definicion_asignacion : asignacion { printf ("definicion_asignacion : asignacion  \n"); } 
+  | declaracion_tipo expresion_indexada '='expresion  { printf ("definicion_asignacion : declaracion_tipo expresion_indexada '='expresion  \n"); } 
+  | declaracion_tipo lista_asteriscos expresion_indexada '='expresion { printf ("definicion_asignacion : declaracion_tipo lista_asteriscos expresion_indexada '='expresion  \n"); } 
 ;
 
 /*
 instruccion_salto ::= 'goto'IDENTIFICADOR ';'| 'continue'';'| 'break'';'
 */
-instruccion_salto : GOTO IDENTIFICADOR ';'| CONTINUE ';'| BREAK ';'
+instruccion_salto : GOTO IDENTIFICADOR ';'| CONTINUE ';'| BREAK ';' 
 ;
 
 /*
