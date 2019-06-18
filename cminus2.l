@@ -14,8 +14,8 @@ OPERADOR "+"|"-"|"*"|"**"|"/"|"%"|"--"|"++"|"*="|"/="|"+="|"-="|"."|"->"|"&"|"["
 SALTO_LINEA      \n
 CARACTER '[^\n'\\]'|'(\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v)'|'\\(37[0-7]|3[0-6][0-7]|[0-2][0-7]{2}|[0-7]{1,2})'|'\\x[0-9a-fA-F]{1,2}'
 CADENA \"([^\n"\\]|\\\'|\\\"|\\\?|\\\\|\\n|\\r|\\t|\\v|\\(37[0-7]|3[0-6][0-7]|[0-2][0-7]{2}|[0-7]{1,2})|\\x[0-9a-fA-F]{1,2}|\\\n)*\"
-DIRECTORIO [^'\n'\"\/\>]+
-ARCHIVO [^'\n'\"\/\>]+\.[:ascii:]
+DIRECTORIO [^\\n\"\/\>]+
+ARCHIVO [^\\n\"\/\>]+"."[^\\n\"\/\>]+
 PATH \<\/?({DIRECTORIO}\/)*{ARCHIVO}\>
 DELIMITADORES [?:;,(){}]
 %x Comentario
@@ -53,7 +53,7 @@ DELIMITADORES [?:;,(){}]
 "void" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return VOID; }
 "while" {printf("nlinea %d, Palabra reservada: %s",linea,yytext); return WHILE; }
 "sizeof" {printf("\nlinea %d, Operador: %s",linea,yytext); return(SIZEOF);}
-{IDENTIFICADOR} {printf("\nlinea %d, Identificador: ",linea); return(IDENTIFICADOR);}
+{IDENTIFICADOR} {printf("\nlinea %d, Identificador: %s",linea,yytext); return(IDENTIFICADOR);}
 {INT} {printf("\nlinea %d, Constante Entera: %s",linea,yytext); return(ENTERO);}
 {FLOAT} {printf("\nlinea %d, Constante Real : %s",linea,yytext); return(REAL);}
 {MANTISA} {printf("\nlinea %d, Constante Real : %s",linea,yytext); return(REAL);}
@@ -82,7 +82,7 @@ DELIMITADORES [?:;,(){}]
 "-\>"	{printf("\nlinea %d, Operador: %s",linea,yytext); return(PTR_ACCESO);}
 "**"	{printf("\nlinea %d, Operador: %s",linea,yytext); return(POTENCIA);}
 
-{OPERADOR} {printf("\nlinea %d, Operador: ",linea); return(*yytext);}
+{OPERADOR} {printf("\nlinea %d, Operador: %s",linea,yytext); return(*yytext);}
 {CARACTER} {printf("\nlinea %d, Caracter: %s",linea,yytext);  return(CARACTER);}
 {CADENA} {printf("\nlinea %d, Caracter: %s",linea,yytext);  return(STRING);}
 {SALTO_LINEA} linea++;

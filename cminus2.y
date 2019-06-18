@@ -82,6 +82,7 @@ lista_almacenamiento: almacenamiento { printf (" lista_almacenamiento -> almacen
 ;
 
 //declaracion_tipo ::= [ almacenamiento ]* tipo_basico_modificado| [ almacenamiento ]* definicion_struct_union | [ almacenamiento ]* definicion_enum
+
 declaracion_tipo : tipo_basico_modificado { printf (" declaracion_tipo -> tipo_basico_modificado \n"); }
   | lista_almacenamiento tipo_basico_modificado { printf (" declaracion_tipo -> lista_almacenamiento lista_almacenamiento \n"); }
   | definicion_struct_union { printf (" declaracion_tipo -> definicion_struct_union \n"); }
@@ -169,11 +170,11 @@ elementos: expresion
 
 //definicion_enum ::= 'enum' IDENTIFICADOR  [':' tipo_basico_modificado ]? cuerpo_enum
 definicion_enum: ENUM IDENTIFICADOR cuerpo_enum
-  | ENUM IDENTIFICADOR ';' tipo_basico_modificado cuerpo_enum
+  | ENUM IDENTIFICADOR ':' tipo_basico_modificado cuerpo_enum
 ;
 
 lista_declaraciones_miembro_enum: declaracion_miembro_enum
-  | lista_declaraciones_miembro_enum declaracion_miembro_enum
+  | lista_declaraciones_miembro_enum ',' declaracion_miembro_enum
 ;
 
 //cuerpo_enum ::= '{' ( declaracion_miembro_enum )+ '}'
