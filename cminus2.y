@@ -192,7 +192,7 @@ declaracion_miembro_enum: IDENTIFICADOR  { printf (" declaracion_miembro_enum->I
 /* INSTRUCCIONES */
 /*****************/
 /*
-instruccion ::= bloque_instrucciones
+instruccion ::= bloque_instrucciones 
   | instruccion_expresion 
   | instruccion_bifurcacion
   | instruccion_bucle
@@ -225,8 +225,8 @@ bloque_instrucciones : '{' '}'  { printf (" bloque_instrucciones ->  '{' '}'   \
 ;
 
 //instruccion_expresion ::= expresion_funcional ';'| asignacion ';' 
-instruccion_expresion : expresion_funcional ';'{ printf ("  instruccion_expresion : expresion_funcional ';' '}'     \n"); }
-| asignacion ';' { printf (" bloque_instrucciones ->  '{' instruccion_expresion :asignacion ';' '}'     \n"); }
+instruccion_expresion : expresion_funcional ';'  { printf ("  instruccion_expresion : expresion_funcional ';'      \n"); }
+| asignacion ';' { printf (" instruccion_expresion  ->  '{' instruccion_expresion :asignacion ';'      \n"); }
 ;
 
 //asignacion ::= expresion_indexada operador_asignacion expresion
@@ -234,17 +234,17 @@ asignacion : expresion_indexada operador_asignacion expresion { printf (" asigna
 ;
 
 //operador_asignacion ::= '='| '*='| '/='| '%='| '+='| '-='| '<<='| '>>='| '&='| '^='| '|='
-operador_asignacion : '=' 
-  | MULT_ASIG { printf (" operador_asignacion ->  MULT_ASIG ';' '}'     \n"); }
-  | DIV_ASIG { printf (" operador_asignacion ->  DIV_ASIG ';' '}'     \n"); }
-  | MOD_ASIG { printf (" operador_asignacion ->  MOD_ASIG ';' '}'     \n"); }
-  | SUMA_ASIG { printf (" operador_asignacion ->  SUMA_ASIG ';' '}'     \n"); }
-  | RESTA_ASIG { printf (" operador_asignacion ->  RESTA_ASIG ';' '}'     \n"); }
-  | DESPI_ASIG { printf (" operador_asignacion ->  DESPI_ASIG ';' '}'     \n"); }
-  | DESPD_ASIG { printf (" operador_asignacion ->  DESPD_ASIG ';' '}'     \n"); }
-  | AND_ASIG { printf (" operador_asignacion ->  AND_ASIG ';' '}'     \n"); }
-  | XOR_ASIG { printf (" operador_asignacion ->  XOR_ASIG ';' '}'     \n"); }
-  | OR_ASIG { printf (" operador_asignacion ->  OR_ASIG ';' '}'     \n"); }
+operador_asignacion : '=' { printf (" operador_asignacion ->  '='  \n"); }
+  | MULT_ASIG  { printf (" operador_asignacion ->  MULT_ASIG  \n"); }
+  | DIV_ASIG   { printf (" operador_asignacion ->  DIV_ASIG   \n"); }
+  | MOD_ASIG   { printf (" operador_asignacion ->  MOD_ASIG   \n"); }
+  | SUMA_ASIG  { printf (" operador_asignacion ->  SUMA_ASIG  \n"); }
+  | RESTA_ASIG { printf (" operador_asignacion ->  RESTA_ASIG \n"); }
+  | DESPI_ASIG { printf (" operador_asignacion ->  DESPI_ASIG \n"); }
+  | DESPD_ASIG { printf (" operador_asignacion ->  DESPD_ASIG \n"); }
+  | AND_ASIG   { printf (" operador_asignacion ->  AND_ASIG   \n"); }
+  | XOR_ASIG   { printf (" operador_asignacion ->  XOR_ASIG   \n"); }
+  | OR_ASIG    { printf (" operador_asignacion ->  OR_ASIG    \n"); }
 ;
 
 
@@ -276,7 +276,7 @@ lista_definicion_asignacion: definicion_asignacion { printf ("lista_definicion_a
 
 /*
 instruccion_bucle ::= 'while''('expresion ')'instruccion 
-  | 'do'instruccion 'while''( expresion ')'';'
+  | 'do'instruccion 'while''( expresion ')'';'  
   | 'for''('( definicion_asignacion )* ';'expresion ';'expresion ')'instruccion
   | 'for''('[ declaracion_tipo [ '*']* ]? IDENTIFICADOR ';'expresion ')'instruccioN
 */
@@ -301,34 +301,35 @@ definicion_asignacion : asignacion { printf ("definicion_asignacion : asignacion
 /*
 instruccion_salto ::= 'goto'IDENTIFICADOR ';'| 'continue'';'| 'break'';'
 */
-instruccion_salto : GOTO IDENTIFICADOR ';'| CONTINUE ';'| BREAK ';' 
+instruccion_salto : GOTO IDENTIFICADOR ';' { printf (" instruccion_salto ->  GOTO IDENTIFICADOR ';' \n"); }
+  | CONTINUE ';'  { printf (" instruccion_salto ->  CONTINUE ';' \n"); }
+  | BREAK ';'  { printf (" instruccion_salto ->  BREAK ';' \n"); }
 ;
 
 /*
 instruccion_destino_salto ::= IDENTIFICADOR ':'instruccion ';'
 */
-instruccion_destino_salto : IDENTIFICADOR ':' instruccion ';'
+instruccion_destino_salto : IDENTIFICADOR ':' instruccion ';'  { printf (" instruccion_destino_salto ->  IDENTIFICADOR ':' instruccion ';'  \n"); }
 ;
 
 /*
 instruccion_retorno ::= 'return'[ expresion ]? ';'
 */
-instruccion_retorno :  RETURN ';'
-  | RETURN expresion ';'
+instruccion_retorno :  RETURN ';' { printf (" instruccion_retorno ->  RETURN ';' \n"); }
+  | RETURN expresion ';'  { printf (" instruccion_retorno ->  RETURN expresion ';' \n"); }
 ;
 
 /***************/
 /* EXPRESIONES */
 /***************/
 
-expresion_constante : 
-ENTERO 
-|REAL 
-|STRING 
-|CARACTER
+expresion_constante : ENTERO  { printf (" expresion_constante ->  ENTERO \n"); }
+|REAL       { printf (" expresion_constante ->  REAL \n"); }
+|STRING     { printf (" expresion_constante ->  STRING \n"); }
+|CARACTER   { printf (" expresion_constante ->  CARACTER \n"); }
 ;
 
-expresion_parentesis :'(' expresion ')'
+expresion_parentesis :'(' expresion ')' { printf (" expresion_parentesis ->  '(' expresion ')' \n"); }
 ;
 
 lista_expresion: expresion
@@ -336,49 +337,50 @@ lista_expresion: expresion
 ;
 
 //expresion_funcional : IDENTIFICADOR '(' ( expresion )* ')'
-expresion_funcional : IDENTIFICADOR  '(' ')'
-  |IDENTIFICADOR '(' lista_expresion ')' 
+expresion_funcional : IDENTIFICADOR  '(' ')' { printf (" expresion_funcional ->  IDENTIFICADOR '(' ')' \n"); }
+  |IDENTIFICADOR '(' lista_expresion ')'  { printf (" expresion_constante ->  IDENTIFICADOR '(' lista_expresion ')' \n"); }
 ;
 
-expresion_indexada : IDENTIFICADOR
-| expresion_indexada '[' expresion ']'
-| expresion_indexada '.' IDENTIFICADOR
-| expresion_indexada PTR_ACCESO IDENTIFICADOR
+expresion_indexada : IDENTIFICADOR  { printf (" expresion_indexada ->  IDENTIFICADOR \n"); }
+| expresion_indexada '[' expresion ']' { printf (" expresion_indexada -> expresion_indexada '[' expresion ']' \n"); }
+| expresion_indexada '.' IDENTIFICADOR { printf (" expresion_indexada -> expresion_indexada '.' IDENTIFICADOR \n"); }
+| expresion_indexada PTR_ACCESO IDENTIFICADOR { printf (" expresion_indexada ->  expresion_indexada PTR_ACCESO IDENTIFICADOR \n"); }
 ;
 
-expresion_postfija : expresion_constante
-| expresion_parentesis
-| expresion_funcional
-| expresion_indexada
-| expresion_postfija INC
-| expresion_postfija DEC
+expresion_postfija : expresion_constante  { printf (" expresion_postfija ->  expresion_constante \n"); }
+| expresion_parentesis { printf (" expresion_postfija ->  expresion_parentesis \n"); }
+| expresion_funcional { printf (" expresion_postfija ->  expresion_funcional \n"); }
+| expresion_indexada { printf (" expresion_postfija ->  expresion_indexada \n"); }
+| expresion_postfija INC { printf (" expresion_postfija ->  expresion_postfija INC \n"); }
+| expresion_postfija DEC { printf (" expresion_postfija ->  expresion_postfija DEC \n"); }
 ;
 
-expresion_prefija : expresion_postfija
-| SIZEOF expresion_prefija
-| SIZEOF '(' nombre_tipo ')'
-| operador_unario expresion_cast
+expresion_prefija : expresion_postfija  { printf (" expresion_prefija ->  expresion_postfija \n"); }
+| SIZEOF expresion_prefija  { printf (" expresion_prefija ->   SIZEOF expresion_prefija \n"); }
+| SIZEOF '(' nombre_tipo ')'  { printf (" expresion_prefija ->  SIZEOF '(' nombre_tipo ')' \n"); }
+| operador_unario expresion_cast  { printf (" expresion_prefija ->  operador_unario expresion_cast \n"); }
 ;
 
-operador_unario :INC
-|DEC
-|'&'
-|'*'
-|'+'
-|'-'
-|'~'
-|'!'
+operador_unario :INC  { printf (" operador_unario ->  INC \n"); }
+|DEC  { printf (" operador_unario ->  DEC \n"); }
+|'&'  { printf (" operador_unario ->  '&'  \n"); }
+|'*'  { printf (" operador_unario ->  '*' \n"); }
+|'+'  { printf (" operador_unario ->  '+'  \n"); }
+|'-'  { printf (" operador_unario ->  '-' \n"); }
+|'~'  { printf (" operador_unario ->  '~' \n"); }
+|'!'  { printf (" operador_unario ->  '!' \n"); }
 ;
 
-expresion_cast : expresion_prefija
-| '(' nombre_tipo ')' expresion_prefija
+expresion_cast : expresion_prefija   { printf (" expresion_cast ->  expresion_prefija \n"); }
+| '(' nombre_tipo ')' expresion_prefija  { printf (" expresion_cast ->  '(' nombre_tipo ')' expresion_prefija \n"); }
 ;
 
-nombre_tipo: tipo_basico_modificado 
-| tipo_basico_modificado lista_asteriscos ;
+nombre_tipo: tipo_basico_modificado  { printf (" nombre_tipo ->  tipo_basico_modificado \n"); }
+| tipo_basico_modificado lista_asteriscos  { printf (" nombre_tipo ->  tipo_basico_modificado lista_asteriscos \n"); }
+;
 
-expresion_or_logico: expresion_or_logico OR expresion_and_logico
-  | expresion_and_logico
+expresion_or_logico: expresion_or_logico OR expresion_and_logico { printf (" expresion_or_logico ->  expresion_or_logico OR expresion_and_logico \n"); }
+  | expresion_and_logico { printf (" expresion_or_logico ->  expresion_and_logico \n"); }
 ;
 
 expresion_and_logico: expresion_and_logico AND expresion_igual_distinto
