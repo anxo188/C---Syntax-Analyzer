@@ -29,6 +29,7 @@
 
 //programa ::= [ bloque ]+
 programa : lista_bloque { printf ("  programa  -> lista_bloque\n"); }
+| error                        { yyerrok;}
 ;
 
 lista_bloque : bloque           { printf ("  lista_bloque  -> bloque\n"); }
@@ -213,10 +214,10 @@ instruccion : bloque_instrucciones { printf (" instruccion -> bloque_instruccion
 
 lista_declaraciones: declaracion { printf (" lista_declaraciones ->  declaracion  \n"); }
   | lista_declaraciones declaracion   { printf (" lista_declaraciones ->  lista_declaraciones declaracion  \n"); }
-
+;
 lista_instrucciones: instruccion { printf (" lista_instrucciones ->  instruccion  \n"); }
   | lista_instrucciones instruccion { printf (" lista_instrucciones ->  lista_instrucciones instruccion  \n"); }
-
+;
 //bloque_instrucciones ::= '{'[ declaracion ]* [ instruccion ]* '}'
 bloque_instrucciones : '{' '}'  { printf (" bloque_instrucciones ->  '{' '}'   \n"); }
   | '{' lista_declaraciones '}'  { printf (" bloque_instrucciones ->  '{' lista_declaraciones '}'   \n"); }
@@ -225,8 +226,8 @@ bloque_instrucciones : '{' '}'  { printf (" bloque_instrucciones ->  '{' '}'   \
 ;
 
 //instruccion_expresion ::= expresion_funcional ';'| asignacion ';' 
-instruccion_expresion : expresion_funcional ';'  { printf ("  instruccion_expresion : expresion_funcional ';'      \n"); }
-| asignacion ';' { printf (" instruccion_expresion  ->  '{' instruccion_expresion :asignacion ';'      \n"); }
+instruccion_expresion : expresion_funcional ';'  { printf ("  instruccion_expresion -> expresion_funcional ';'      \n"); }
+| asignacion ';' { printf (" instruccion_expresion  ->  '{' instruccion_expresion->asignacion ';'      \n"); }
 ;
 
 //asignacion ::= expresion_indexada operador_asignacion expresion
@@ -255,7 +256,8 @@ lista_instruccion_caso: instruccion_caso { printf (" lista_instruccion_caso: ins
 
 //instruccion_bifurcacion ::= 'if''('expresion ')'instruccion [ 'else'instruccion ]?| SWITCH '('expresion ')''{'[ instruccion_caso ]+ '}'
 opciones: instruccion { printf (" opciones: instruccion   \n"); }
- | instruccion ELSE instruccion { printf (" opciones: instruccion ELSE instruccion   \n"); } ;
+ | instruccion ELSE instruccion { printf (" opciones: instruccion ELSE instruccion   \n"); } 
+ ;
 
 instruccion_bifurcacion :IF '(' expresion ')' opciones { printf ("instruccion_bifurcacion : IF '(' expresion ')' opciones   \n"); } ;
   | SWITCH '('expresion ')' '{' lista_instruccion_caso '}' { printf ("instruccion_bifurcacion :  SWITCH '('expresion ')' '{' lista_instruccion_caso '}'  \n"); } ;
@@ -383,63 +385,63 @@ expresion_or_logico: expresion_or_logico OR expresion_and_logico { printf (" exp
   | expresion_and_logico { printf (" expresion_or_logico ->  expresion_and_logico \n"); }
 ;
 
-expresion_and_logico: expresion_and_logico AND expresion_igual_distinto
-  | expresion_igual_distinto
+expresion_and_logico: expresion_and_logico AND expresion_igual_distinto { printf (" expresion_and_logico ->   expresion_and_logico AND expresion_igual_distinto \n"); }
+  | expresion_igual_distinto  { printf (" expresion_and_logico ->   expresion_igual_distinto \n"); }
 ;
 
-expresion_igual_distinto: expresion_igual_distinto EQ expresion_mayor_menor
-  | expresion_igual_distinto NEQ expresion_mayor_menor
-  | expresion_mayor_menor
+expresion_igual_distinto: expresion_igual_distinto EQ expresion_mayor_menor { printf (" expresion_and_logico ->   expresion_igual_distinto EQ expresion_mayor_menor \n"); }
+  | expresion_igual_distinto NEQ expresion_mayor_menor { printf (" expresion_and_logico ->  expresion_igual_distinto NEQ expresion_mayor_menor  \n"); }
+  | expresion_mayor_menor { printf (" expresion_and_logico ->  expresion_mayor_menor \n"); }
 ;
 
-expresion_mayor_menor: expresion_mayor_menor '<' expresion_or
-  | expresion_mayor_menor '>' expresion_or
-  | expresion_mayor_menor LE expresion_or
-  | expresion_mayor_menor GE expresion_or
-  |expresion_or
+expresion_mayor_menor: expresion_mayor_menor '<' expresion_or { printf (" expresion_mayor_menor ->  expresion_mayor_menor '<' expresion_or  \n"); }
+  | expresion_mayor_menor '>' expresion_or  { printf (" expresion_and_logico -> expresion_mayor_menor '>' expresion_or    \n"); }
+  | expresion_mayor_menor LE expresion_or    { printf (" expresion_mayor_menor LE expresion_or     \n"); }
+  | expresion_mayor_menor GE expresion_or  { printf (" expresion_mayor_menor GE expresion_or   \n"); }
+  |expresion_or  { printf (" expresion_mayor_menor -> expresion_or    \n"); }
 ;
 
-expresion_or: expresion_or '|' expresion_xor
-  | expresion_xor
+expresion_or: expresion_or '|' expresion_xor  { printf (" expresion_or -> expresion_or '|' expresion_xor     \n"); }
+  | expresion_xor { printf (" expresion_or ->  expresion_xor \n"); }
 ;
 
-expresion_xor: expresion_xor '^' expresion_and
-   | expresion_and
+expresion_xor: expresion_xor '^' expresion_and { printf (" expresion_xor ->  expresion_xor '^' expresion_and \n"); }
+   | expresion_and { printf (" expresion_xor ->  expresion_and \n"); }
 ;
 
-expresion_and: expresion_and '&' expresion_desplazar
-   | expresion_desplazar
+expresion_and: expresion_and '&' expresion_desplazar { printf (" expresion_and -> expresion_and '&' expresion_desplazar     \n"); }
+   | expresion_desplazar { printf (" expresion_and -> expresion_desplazar    \n"); }
 ;
 
-expresion_desplazar: expresion_desplazar DESPD expresion_suma_resta
-  | expresion_desplazar DESPI expresion_suma_resta
-  | expresion_suma_resta
+expresion_desplazar: expresion_desplazar DESPD expresion_suma_resta { printf (" expresion_desplazar -> expresion_desplazar DESPD expresion_suma_resta     \n"); }
+  | expresion_desplazar DESPI expresion_suma_resta { printf (" expresion_desplazar -> expresion_desplazar DESPI expresion_suma_resta      \n"); }
+  | expresion_suma_resta { printf (" expresion_desplazar -> expresion_suma_resta\n"); }
 ;
 
-expresion_suma_resta: expresion_suma_resta '+' expresion_multiplicacion
+expresion_suma_resta: expresion_suma_resta '+' expresion_multiplicacion { printf (" expresion_suma_resta -> expresion_suma_resta '+' expresion_multiplicacion\n"); }
   | expresion_suma_resta '-' expresion_multiplicacion
   | expresion_multiplicacion
 ;
 
 
-expresion_multiplicacion: expresion_multiplicacion '*' expresion_potencia
-  | expresion_multiplicacion '/' expresion_potencia
-  | expresion_multiplicacion '%' expresion_potencia
-  | expresion_potencia
+expresion_multiplicacion: expresion_multiplicacion '*' expresion_potencia { printf (" expresion_multiplicacion -> expresion_multiplicacion '*' expresion_potencia\n"); }
+  | expresion_multiplicacion '/' expresion_potencia { printf (" expresion_multiplicacion -> expresion_multiplicacion '/' expresion_potencia\n"); }
+  | expresion_multiplicacion '%' expresion_potencia { printf (" expresion_multiplicacion ->  expresion_multiplicacion '%' expresion_potencia \n"); }
+  | expresion_potencia { printf (" expresion_multiplicacion -> expresion_potencia \n"); }
 ;
 
-expresion_potencia: expresion_cast 
-  | expresion_cast POTENCIA expresion_potencia
+expresion_potencia: expresion_cast  { printf (" expresion_potencia -> expresion_cast \n"); }
+  | expresion_cast POTENCIA expresion_potencia { printf (" expresion_potencia -> expresion_cast POTENCIA expresion_potencia \n"); }
  ;
 
 
 
-expresion_logica: expresion_or_logico
+expresion_logica: expresion_or_logico { printf (" expresion_logica -> expresion_or_logico \n"); }
 ;
 
 //expresion ::= expresion_logica [ '?' expresion ':' expresion ]?
-expresion: expresion_logica
-  | expresion_logica '?' expresion ':' expresion
+expresion: expresion_logica { printf (" expresion -> expresion_logica \n"); }
+  | expresion_logica '?' expresion ':' expresion { printf (" expresion -> expresion_logica '?' expresion  \n"); }
 ;
 
 %%
